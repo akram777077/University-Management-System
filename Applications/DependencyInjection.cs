@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Applications.Interfaces.Repositories;
+using Applications.Mappers;
+using Applications.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Applications
 {
@@ -6,11 +9,9 @@ namespace Applications
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            //Register Application service here
-            //services.AddScoped<ICourseService, CourseService>();
+            services.AddAutoMapper(typeof(MappingProfile));
 
-            // Register cross-cutting concerns for the application layer
-            //services.AddAutoMapper();
+            services.AddScoped<IStudentService, StudentService>();
 
             return services;
         }
