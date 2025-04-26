@@ -7,5 +7,10 @@
         public string? LName { get; set; }
 
         public ICollection<Section> Sections { get; set; } = new List<Section>();
+
+        public override string ToString()
+        {
+            return $"{LName} {FName}";
+        }
     }
 }
