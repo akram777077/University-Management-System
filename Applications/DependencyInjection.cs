@@ -1,6 +1,7 @@
 ﻿using Applications.Interfaces.Repositories;
 using Applications.Mappers;
 using Applications.Services;
+using Applications.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Applications
@@ -12,6 +13,7 @@ namespace Applications
             services.AddAutoMapper(typeof(MappingProfile));
 
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IMyLogger, MyLogger>();
 
             return services;
         }
