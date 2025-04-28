@@ -10,5 +10,9 @@ namespace Applications.DTOs
 
         public ICollection<Section> Sections { get; set; } = new List<Section>();
 
+        public override string ToString()
+        {
+            return $"Id: {Id}, FirstName: {FName}, LastName: {LName}";
+        }
     }
 }
