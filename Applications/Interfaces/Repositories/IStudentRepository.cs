@@ -5,14 +5,14 @@ namespace Applications.Interfaces.Repositories
 {
     public interface IStudentRepository
     {
-        Task<List<Student>> GetStudentsAsync();
+        Task<List<Student>> GetAllAsync();
         Task<Student?> GetByIdAsync(int id);
         Task<Student?> GetByNameAsync(string lastName);
-        Task<int> AddStudentAsync(Student student);
+        Task<int> AddAsync(Student student);
         Task<bool> UpdateAsync(Student student);
-        Task<bool> DeleteAsync(Student student);
-        Task<bool> DeleteByNameAsync(string lastName);
-        Task<bool> DoesStudentExistAsync(string lastName);
-        Task<bool> DoesStudentExistAsync(int id);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(string lastName);
+        Task<bool> DoesExistAsync(string lastName);
+        Task<bool> DoesExistAsync(int id);
     }
 }
