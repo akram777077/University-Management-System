@@ -14,30 +14,31 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<Student>> GetStudentsAsync() => await _context.Students.ToListAsync();
-
-        public async Task<int> AddStudentAsync(Student student)
+        public async Task<List<Student>> GetAllAsync()
         {
-            if(student == null)
-                throw new ArgumentNullException(nameof(student));
+            return await _context.Students.ToListAsync();
+        }
 
+        public async Task<int> AddAsync(Student student)
+        {
             await _context.Students.AddAsync(student);
             student.Id = await _context.SaveChangesAsync();
-        
             return student.Id;
         }
 
-        public async Task<bool> DeleteAsync(Student student)
+        public async Task<bool> DeleteAsync(int id)
         {
+            var student = await _context.Students.FindAsync(id);
+
+            if (student == null)
+                return false;
+
             _context.Students.Remove(student);           
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteByNameAsync(string lastName)
+        public async Task<bool> DeleteAsync(string lastName)
         {
-            if (string.IsNullOrEmpty(lastName))
-                throw new ArgumentException("Last name cannot be null or empty", nameof(lastName));
-
             var student = await _context.Students.FirstOrDefaultAsync(n => n.LName == lastName);
 
             if (student == null)
@@ -49,42 +50,27 @@ namespace Infrastructure.Repositories
                 
         public async Task<Student?> GetByIdAsync(int id)
         {
-            if (id <= 0)
-                throw new ArgumentException("ID must be positive", nameof(id));
-
             return await _context.Students.FindAsync(id);
         }
                 
         public async Task<Student?> GetByNameAsync(string lastName)
         {
-            if (string.IsNullOrEmpty(lastName))
-                throw new ArgumentException("Last name cannot be null or empty", nameof(lastName));
-
             return await _context.Students.FirstOrDefaultAsync(n => n.LName == lastName);
         }
 
         public async Task<bool> UpdateAsync(Student student)
         {
-            if (student == null)
-                throw new ArgumentNullException(nameof(student));
-
             _context.Students.Update(student);
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DoesStudentExistAsync(string lastName)
+        public async Task<bool> DoesExistAsync(string lastName)
         {
-            if (string.IsNullOrEmpty(lastName))
-                throw new ArgumentException("Last name cannot be null or empty", nameof(lastName));
-
             return await _context.Students.AnyAsync(n => n.LName == lastName);
         }
     
-        public async Task<bool> DoesStudentExistAsync(int id)
+        public async Task<bool> DoesExistAsync(int id)
         {
-            if (id <= 0)
-                throw new ArgumentException("ID must be positive", nameof(id));
-
             return await _context.Students.AnyAsync(x => x.Id == id);
         }
     }
