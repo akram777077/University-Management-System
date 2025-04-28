@@ -11,7 +11,7 @@
 
             if(value != null)
             {
-                logEntry += $"- Value: {value.ToString()}";
+                logEntry += $"- Value: {value}";
             }
 
             if (ex != null)

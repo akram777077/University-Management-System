@@ -1,4 +1,4 @@
-﻿namespace Applications.Interfaces.Repositories
+﻿namespace Applications.Interfaces.Services
 {
     public interface ISectionService
     {

@@ -1,4 +1,4 @@
-﻿using Applications.Interfaces.Repositories;
+﻿using Applications.Interfaces.Services;
 using Applications.Mappers;
 using Applications.Services;
 using Applications.Utilities;
