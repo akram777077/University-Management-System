@@ -1,0 +1,9 @@
+﻿namespace Domain.Enums
+{
+    public enum ErrorType
+    {
+        NotFound,
+        BadRequest,
+        InternalServerError
+    };
+}

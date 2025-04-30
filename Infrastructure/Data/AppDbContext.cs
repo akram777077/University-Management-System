@@ -5,22 +5,16 @@ namespace Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {
-        DbSet<Course> Courses { get; set; }
-        DbSet<Enrollment> Enrollments { get; set; }
-        DbSet<Instructor> Instructors { get; set; }
-        DbSet<Office> Offices { get; set; }
-        DbSet<Schedule> Schedules { get; set; }
-        DbSet<Section> Sections { get; set; }
-        DbSet<SectionSchedule> SectionSchedules { get; set; }
-        DbSet<Student> Students { get; set; }
-
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
+        public DbSet<Office> Offices { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Section> Sections { get; set; }
+        public DbSet<SectionSchedule> SectionSchedules { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

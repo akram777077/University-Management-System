@@ -1,4 +1,6 @@
-﻿using Infrastructure.Data;
+﻿using Applications.Interfaces.Repositories;
+using Infrastructure.Data;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,8 +15,7 @@ namespace Infrastructure
             services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-            //Register Infrastructure service here
-            //services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
 
             return services;
         }
