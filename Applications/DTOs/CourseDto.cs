@@ -1,11 +1,12 @@
 ﻿namespace Applications.DTOs
 {
-    public record StudentDto
+    public record CourseDto
     {
         public int Id { get; init; }
-        public string? FName { get; init; }
-        public string? LName { get; init; }
-
+        public string? CourseName { get; init; }
+        public decimal Price { get; init; }
         public ICollection<SectionDto> Sections { get; init; } = new List<SectionDto>();
     }
 }
+
+
