@@ -14,13 +14,7 @@ namespace Infrastructure.Data
         public DbSet<SectionSchedule> SectionSchedules { get; set; }
         public DbSet<Student> Students { get; set; }
 
-
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
