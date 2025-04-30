@@ -1,11 +1,18 @@
-﻿namespace Applications.DTOs
-{
-    public record StudentDto
-    {
-        public int Id { get; init; }
-        public string? FName { get; init; }
-        public string? LName { get; init; }
+﻿using Domain.Entities;
 
-        public ICollection<SectionDto> Sections { get; init; } = new List<SectionDto>();
+namespace Applications.DTOs
+{
+    public class StudentDto
+    {
+        public int Id { get; set; }
+        public string? FName { get; set; }
+        public string? LName { get; set; }
+
+        public ICollection<Section> Sections { get; set; } = new List<Section>();
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, FirstName: {FName}, LastName: {LName}";
+        }
     }
 }
