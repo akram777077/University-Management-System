@@ -5,6 +5,7 @@ using Applications.Shared;
 using Applications.Utilities;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Applications.Services
 {
@@ -28,7 +29,10 @@ namespace Applications.Services
                 //Refactor later to use AutoMapper Projection when the database grows
                 var students = await _repository.GetAllAsync();
                 if (students == null || students.Count == 0)
-                    return Result<IReadOnlyCollection<StudentDto>>.Failure("No students found in the system");
+                {
+                    return Result<IReadOnlyCollection<StudentDto>>.Failure(
+                        "No students found in the system", ErrorType.NotFound);
+                }
 
                 var studentsDto = _mapper.Map<IReadOnlyCollection<StudentDto>>(students);
                 return Result<IReadOnlyCollection<StudentDto>>.Success(studentsDto);
@@ -36,15 +40,16 @@ namespace Applications.Services
             catch (Exception ex)
             {
                 _logger.LogError("Database error retrieving all student", ex);
+
                 return Result<IReadOnlyCollection<StudentDto>>
-                    .Failure("Failed to retrieve students due to a system error");
+                    .Failure("Failed to retrieve students due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result<int>> AddAsync(StudentDto studentDto)
         {
             if (studentDto == null)
-                return Result<int>.Failure("Student information is required");
+                return Result<int>.Failure("Student information is required", ErrorType.BadRequest);
 
             var student = _mapper.Map<Student>(studentDto);
 
@@ -55,19 +60,19 @@ namespace Applications.Services
                 if (id > 0)
                     return Result<int>.Success(id);
 
-                return Result<int>.Failure("Failed to create new student record");
+                return Result<int>.Failure("Failed to create new student record", ErrorType.BadRequest);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error adding new student", ex, new { studentDto });
-                return Result<int>.Failure("Failed to create student due to a system error");
+                return Result<int>.Failure("Failed to create student due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result> UpdateAsync(StudentDto studentDto)
         {
             if (studentDto == null)
-                return Result.Failure("Student information is required for update");
+                return Result.Failure("Student information is required for update", ErrorType.BadRequest);
 
             var student = _mapper.Map<Student>(studentDto);
             try
@@ -77,19 +82,19 @@ namespace Applications.Services
                 if (isUpdated)
                     return Result.Success;
 
-                return Result.Failure($"Failed to update student");
+                return Result.Failure($"Failed to update student", ErrorType.BadRequest);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error updating student", ex, new { studentDto });
-                return Result.Failure("Failed to update student due to a system error");
+                return Result.Failure("Failed to update student due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result> DeleteAsync(int id)
         {
             if (id <= 0)
-                return Result.Failure("Invalid student ID provided");
+                return Result.Failure("Invalid student ID provided", ErrorType.BadRequest);
 
             try
             {
@@ -98,12 +103,12 @@ namespace Applications.Services
                 if (isDeleted)
                     return Result.Success;
 
-                return Result.Failure("Student not found");
+                return Result.Failure("Student not found", ErrorType.NotFound);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error deleting student", ex, new { id });
-                return Result.Failure("Failed to delete student due to a system error");
+                return Result.Failure("Failed to delete student due to a system error", ErrorType.InternalServerError);
             }
 
         }
@@ -111,7 +116,7 @@ namespace Applications.Services
         public async Task<Result> DeleteAsync(string lastName)
         {
             if (string.IsNullOrEmpty(lastName))
-                return Result.Failure("Last name is required");
+                return Result.Failure("Last name is required", ErrorType.BadRequest);
 
             try
             {
@@ -120,19 +125,19 @@ namespace Applications.Services
                 if (isDeleted)
                     return Result.Success;
 
-                return Result.Failure("Student not found");
+                return Result.Failure("Student not found", ErrorType.NotFound);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error deleting student", ex, new { lastName });
-                return Result.Failure("Failed to delete student due to a system error");
+                return Result.Failure("Failed to delete student due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result> DoesExistAsync(int id)
         {
             if (id <= 0)
-                return Result.Failure("Invalid student ID provided");
+                return Result.Failure("Invalid student ID provided", ErrorType.BadRequest);
 
             try
             {
@@ -141,19 +146,19 @@ namespace Applications.Services
                 if (isFound)
                     return Result.Success;
 
-                return Result.Failure("Student not found with the specified ID");
+                return Result.Failure("Student not found with the specified ID", ErrorType.NotFound);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error checking student existence", ex, new { id });
-                return Result.Failure("Failed to verify student existence due to a system error");
+                return Result.Failure("Failed to verify student existence due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result> DoesExistAsync(string lastName)
         {
             if (string.IsNullOrEmpty(lastName))
-                return Result.Failure("Last name is required");
+                return Result.Failure("Last name is required", ErrorType.BadRequest);
 
             try
             {
@@ -162,25 +167,25 @@ namespace Applications.Services
                 if (isFound)
                     return Result.Success;
 
-                return Result.Failure("Student not found with the specified last name");
+                return Result.Failure("Student not found with the specified last name", ErrorType.NotFound);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error checking student existence", ex, new { lastName });
-                return Result.Failure("Failed to verify student existence due to a system error");
+                return Result.Failure("Failed to verify student existence due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result<StudentDto>> GetByIdAsync(int id)
         {
             if (id <= 0)
-                return Result<StudentDto>.Failure("Invalid student ID provided");
+                return Result<StudentDto>.Failure("Invalid student ID provided", ErrorType.BadRequest);
 
             try
             {
                 var student = await _repository.GetByIdAsync(id);
                 if (student == null)
-                    return Result<StudentDto>.Failure("Student not found with the specified ID");
+                    return Result<StudentDto>.Failure("Student not found with the specified ID", ErrorType.NotFound);
 
                 var studentDto = _mapper.Map<StudentDto>(student);
                 return Result<StudentDto>.Success(studentDto);
@@ -188,20 +193,24 @@ namespace Applications.Services
             catch (Exception ex)
             {
                 _logger.LogError("Database error retrieving student", ex, new { id });
-                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error");
+                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
             }
         }
 
         public async Task<Result<StudentDto>> GetByNameAsync(string lastName)
         {
             if (string.IsNullOrEmpty(lastName))
-                return Result<StudentDto>.Failure("Last name is required");
+                return Result<StudentDto>.Failure("Last name is required", ErrorType.BadRequest);
 
             try
             {
                 var student = await _repository.GetByNameAsync(lastName);
+                
                 if (student == null)
-                    return Result<StudentDto>.Failure("Student not found with the specified last name");
+                {
+                    return Result<StudentDto>.Failure(
+                        "Student not found with the specified last name", ErrorType.NotFound);
+                }
 
                 var studentDto = _mapper.Map<StudentDto>(student);
                 return Result<StudentDto>.Success(studentDto);
@@ -209,7 +218,7 @@ namespace Applications.Services
             catch (Exception ex)
             {
                 _logger.LogError("Database error retrieving student", ex, new { lastName });
-                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error");
+                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
             }
         }
 
