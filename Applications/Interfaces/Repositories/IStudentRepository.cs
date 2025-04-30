@@ -1,5 +1,4 @@
-﻿using Applications.DTOs;
-using Domain.Entities;
+﻿using Domain.Entities;
 
 namespace Applications.Interfaces.Repositories
 {
