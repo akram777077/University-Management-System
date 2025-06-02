@@ -12,8 +12,10 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
             IConfiguration configuration)
         {
+            var connectionString = configuration["DefaultConnection"];
+
             services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(connectionString));
 
             services.AddScoped<IStudentRepository, StudentRepository>();
 
