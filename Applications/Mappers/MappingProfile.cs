@@ -11,6 +11,7 @@ namespace Applications.Mappers
 
         //Method signatures
         partial void ApplyStudentMapping();
+        partial void ApplyCourseMapping();
     }
 
   
