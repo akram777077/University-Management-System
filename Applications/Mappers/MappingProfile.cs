@@ -7,6 +7,7 @@ namespace Applications.Mappers
         public MappingProfile()
         {
             ApplyStudentMapping();
+            ApplyCourseMapping();
         }
 
         //Method signatures
