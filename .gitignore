@@ -10,6 +10,14 @@
 *.userosscache
 *.sln.docstates
 
+# Ignore .env files (real credentials)
+.env
+*.env
+.env.local
+
+# But keep .env.example (template)
+!.env.example
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
