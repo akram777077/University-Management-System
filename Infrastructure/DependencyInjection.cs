@@ -18,6 +18,7 @@ namespace Infrastructure
                 options.UseNpgsql(connectionString));
 
             services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
 
             return services;

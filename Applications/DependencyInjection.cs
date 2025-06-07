@@ -15,6 +15,7 @@ namespace Applications
 
             services.AddScoped<IMyLogger, MyLogger>();
             services.AddScoped<ICountryService, CountryService>();
+            services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IStudentService, StudentService>();
 
             return services;
