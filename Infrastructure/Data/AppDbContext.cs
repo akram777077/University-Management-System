@@ -6,6 +6,8 @@ namespace Infrastructure.Data
     public class AppDbContext : DbContext
     {
         public DbSet<Student> Students { get; set; }
+        public DbSet<Person> People { get; set; }
+        public DbSet<Country> Countries { get; set; }  
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
