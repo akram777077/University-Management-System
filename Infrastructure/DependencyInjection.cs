@@ -17,6 +17,7 @@ namespace Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
+            services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
 
             return services;
