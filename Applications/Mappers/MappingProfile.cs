@@ -8,11 +8,13 @@ namespace Applications.Mappers
         {
             ApplyStudentMapping();
             ApplyCountryMapping();
+            ApplyPersonMapping();
         }
 
         //Method signatures
         partial void ApplyStudentMapping();
         partial void ApplyCountryMapping();
+        partial void ApplyPersonMapping();
     }
 
   
