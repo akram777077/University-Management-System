@@ -12,6 +12,7 @@ namespace Presentation.Controllers.ResultExtension
             {
                 ErrorType.NotFound => new NotFoundObjectResult(result.Error),
                 ErrorType.BadRequest => new BadRequestObjectResult(result.Error),
+                ErrorType.Conflict => new ConflictObjectResult(result.Error),
                 _ => new ObjectResult(result.Error) { StatusCode = 500 }
             };
         }
