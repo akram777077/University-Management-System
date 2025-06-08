@@ -1,4 +1,6 @@
-﻿using Applications.DTOs;
+﻿using Applications.DTOs.People;
+using Applications.DTOs.Student;
+using Applications.Helpers;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Shared;
@@ -22,71 +24,82 @@ namespace Applications.Services
             _logger = logger;
         }
 
-        public async Task<Result<IReadOnlyCollection<StudentDto>>> GetAllAsync()
+        public async Task<Result<IReadOnlyCollection<StudentResponse>>> GetListAsync()
         {
             try
             {
                 //Refactor later to use AutoMapper Projection when the database grows
-                var students = await _repository.GetAllAsync();
-                if (students == null || students.Count == 0)
+                var students = await _repository.GetListAsync();
+                if (students == null || !students.Any())
                 {
-                    return Result<IReadOnlyCollection<StudentDto>>.Failure(
+                    return Result<IReadOnlyCollection<StudentResponse>>.Failure(
                         "No students found in the system", ErrorType.NotFound);
                 }
 
-                var studentsDto = _mapper.Map<IReadOnlyCollection<StudentDto>>(students);
-                return Result<IReadOnlyCollection<StudentDto>>.Success(studentsDto);
+                var response = _mapper.Map<IReadOnlyCollection<StudentResponse>>(students);
+                return Result<IReadOnlyCollection<StudentResponse>>.Success(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error retrieving all student", ex);
 
-                return Result<IReadOnlyCollection<StudentDto>>
+                return Result<IReadOnlyCollection<StudentResponse>>
                     .Failure("Failed to retrieve students due to a system error", ErrorType.InternalServerError);
             }
         }
 
-        public async Task<Result<int>> AddAsync(StudentDto studentDto)
+        public async Task<Result<StudentResponse>> AddAsync(StudentRequest? request)
         {
-            if (studentDto == null)
-                return Result<int>.Failure("Student information is required", ErrorType.BadRequest);
+            if (request == null)
+                return Result<StudentResponse>.Failure("Student information is required", ErrorType.BadRequest);
 
-            var student = _mapper.Map<Student>(studentDto);
+            var isExist = await DoesExistAsync(request.Value.PersonId);
+
+            if (isExist)
+                return Result<StudentResponse>.Failure("Student already exists", ErrorType.Conflict);
+
+            var student = _mapper.Map<Student>(request);
+
+            student.StudentNumber = student.GenerateStudentNumber();
 
             try
             {
                 int id = await _repository.AddAsync(student);
 
-                if (id > 0)
-                    return Result<int>.Success(id);
+                if (id <= 0)
+                    return Result<StudentResponse>.Failure("Failed to create new student record", ErrorType.BadRequest);
 
-                return Result<int>.Failure("Failed to create new student record", ErrorType.BadRequest);
+                var response = _mapper.Map<StudentResponse>(student);
+
+                return Result<StudentResponse>.Success(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database error adding new student", ex, new { studentDto });
-                return Result<int>.Failure("Failed to create student due to a system error", ErrorType.InternalServerError);
+                _logger.LogError("Database error adding new student", ex, new { request });
+                return Result<StudentResponse>.Failure("Failed to create student due to a system error", ErrorType.InternalServerError);
             }
         }
 
-        public async Task<Result> UpdateAsync(StudentDto studentDto)
+        public async Task<Result> UpdateAsync(int id, StudentRequest? request)
         {
-            if (studentDto == null)
+            if (request == null)
                 return Result.Failure("Student information is required for update", ErrorType.BadRequest);
 
-            var student = _mapper.Map<Student>(studentDto);
+            var student = _mapper.Map<Student>(request);
+            student.Id = id;
+
             try
             {
                 bool isUpdated = await _repository.UpdateAsync(student);
 
-                if (isUpdated)
-                    return Result.Success;
+                if (!isUpdated)
+                    return Result.Failure($"Failed to update student", ErrorType.BadRequest);
 
-                return Result.Failure($"Failed to update student", ErrorType.BadRequest);
+                return Result.Success;
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database error updating student", ex, new { studentDto });
+                _logger.LogError("Database error updating student", ex, new { request });
                 return Result.Failure("Failed to update student due to a system error", ErrorType.InternalServerError);
             }
         }
@@ -100,10 +113,10 @@ namespace Applications.Services
             {
                 bool isDeleted = await _repository.DeleteAsync(id);
 
-                if (isDeleted)
-                    return Result.Success;
+                if (!isDeleted)
+                    return Result.Failure("Student not found", ErrorType.NotFound);
 
-                return Result.Failure("Student not found", ErrorType.NotFound);
+                return Result.Success;
             }
             catch (Exception ex)
             {
@@ -113,115 +126,151 @@ namespace Applications.Services
 
         }
 
-        public async Task<Result> DeleteAsync(string lastName)
+        public async Task<Result> DeleteAsync(string studentNumber)
         {
-            if (string.IsNullOrEmpty(lastName))
-                return Result.Failure("Last name is required", ErrorType.BadRequest);
+            if (string.IsNullOrEmpty(studentNumber))
+                return Result.Failure("Student number is required", ErrorType.BadRequest);
 
             try
             {
-                bool isDeleted = await _repository.DeleteAsync(lastName);
+                bool isDeleted = await _repository.DeleteAsync(studentNumber);
 
-                if (isDeleted)
-                    return Result.Success;
+                if (!isDeleted)
+                    return Result.Failure("Student not found", ErrorType.NotFound);
 
-                return Result.Failure("Student not found", ErrorType.NotFound);
+                return Result.Success;
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database error deleting student", ex, new { lastName });
+                _logger.LogError("Database error deleting student", ex, new { studentNumber });
                 return Result.Failure("Failed to delete student due to a system error", ErrorType.InternalServerError);
             }
         }
 
-        public async Task<Result> DoesExistAsync(int id)
+        public async Task<bool> DoesExistAsync(int id)
         {
             if (id <= 0)
-                return Result.Failure("Invalid student ID provided", ErrorType.BadRequest);
+                return false;
 
             try
             {
                 var isFound = await _repository.DoesExistAsync(id);
 
-                if (isFound)
-                    return Result.Success;
+                if (!isFound)
+                    return false;
 
-                return Result.Failure("Student not found with the specified ID", ErrorType.NotFound);
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error checking student existence", ex, new { id });
-                return Result.Failure("Failed to verify student existence due to a system error", ErrorType.InternalServerError);
+                return false;
             }
         }
 
-        public async Task<Result> DoesExistAsync(string lastName)
+        public async Task<bool> DoesExistAsync(string studentNumber)
         {
-            if (string.IsNullOrEmpty(lastName))
-                return Result.Failure("Last name is required", ErrorType.BadRequest);
+            if (string.IsNullOrEmpty(studentNumber))
+                return false;
 
             try
             {
-                var isFound = await _repository.DoesExistAsync(lastName);
+                var isFound = await _repository.DoesExistAsync(studentNumber);
 
-                if (isFound)
-                    return Result.Success;
+                if (!isFound)
+                    return false;
 
-                return Result.Failure("Student not found with the specified last name", ErrorType.NotFound);
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database error checking student existence", ex, new { lastName });
-                return Result.Failure("Failed to verify student existence due to a system error", ErrorType.InternalServerError);
+                _logger.LogError("Database error checking student existence", ex, new { studentNumber });
+                return false;
             }
         }
 
-        public async Task<Result<StudentDto>> GetByIdAsync(int id)
+        public async Task<Result<StudentResponse>> GetByIdAsync(int id)
         {
             if (id <= 0)
-                return Result<StudentDto>.Failure("Invalid student ID provided", ErrorType.BadRequest);
+                return Result<StudentResponse>.Failure("Invalid student ID provided", ErrorType.BadRequest);
 
             try
             {
                 var student = await _repository.GetByIdAsync(id);
-                if (student == null)
-                    return Result<StudentDto>.Failure("Student not found with the specified ID", ErrorType.NotFound);
 
-                var studentDto = _mapper.Map<StudentDto>(student);
-                return Result<StudentDto>.Success(studentDto);
+                if (student == null)
+                    return Result<StudentResponse>.Failure("Student not found with the specified ID", ErrorType.NotFound);
+
+                var response = _mapper.Map<StudentResponse>(student);
+
+                return Result<StudentResponse>.Success(response);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error retrieving student", ex, new { id });
-                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
+                return Result<StudentResponse>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
             }
         }
 
-        public async Task<Result<StudentDto>> GetByNameAsync(string lastName)
+        public async Task<Result<StudentResponse>> GetByStudentNumberAsync(string studentNumber)
         {
-            if (string.IsNullOrEmpty(lastName))
-                return Result<StudentDto>.Failure("Last name is required", ErrorType.BadRequest);
+            if (string.IsNullOrEmpty(studentNumber))
+                return Result<StudentResponse>.Failure("Student number is required", ErrorType.BadRequest);
 
             try
             {
-                var student = await _repository.GetByNameAsync(lastName);
-                
+                var student = await _repository.GetByStudentNumberAsync(studentNumber);
+
                 if (student == null)
                 {
-                    return Result<StudentDto>.Failure(
+                    return Result<StudentResponse>.Failure(
                         "Student not found with the specified last name", ErrorType.NotFound);
                 }
 
-                var studentDto = _mapper.Map<StudentDto>(student);
-                return Result<StudentDto>.Success(studentDto);
+                var response = _mapper.Map<StudentResponse>(student);
+                return Result<StudentResponse>.Success(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Database error retrieving student", ex, new { lastName });
-                return Result<StudentDto>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
+                _logger.LogError("Database error retrieving student", ex, new { studentNumber });
+                return Result<StudentResponse>.Failure("Failed to retrieve student due to a system error", ErrorType.InternalServerError);
             }
         }
 
+        public async Task<Result> UpdateStudentStatusAsync(int id, UpdateStudentStatusRequest? status)
+        {
+            if (id <= 0)
+                return Result.Failure("Invalid student ID provided", ErrorType.BadRequest);
+
+            if(!status.HasValue)
+                return Result.Failure("No Status Value Provided", ErrorType.BadRequest);
+
+            try
+            {
+                var student = await _repository.GetByIdAsync(id);
+
+                if (student == null)
+                    return Result.Failure($"Student not found", ErrorType.NotFound);
+
+                student.StudentStatus = status.Value.StudentStatus;
+
+                student.Notes = string.IsNullOrEmpty(status.Value.Notes) 
+                    ? student.Notes : status.Value.Notes;
+
+                var isUpdated = await _repository.UpdateAsync(student);
+
+                if(!isUpdated)
+                    return Result.Failure($"Failed to update student status", ErrorType.BadRequest);
+
+                return Result.Success;
+            }
+            catch (Exception ex)
+            {
+                var statusName = status.ToString();
+                _logger.LogError("Database error updating student", ex, new { statusName });
+                return Result.Failure("Failed to update student due to a system error", ErrorType.InternalServerError);
+            }
+        }
     }
 }
 
