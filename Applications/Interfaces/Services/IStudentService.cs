@@ -1,18 +1,20 @@
-﻿using Applications.DTOs;
+﻿using Applications.DTOs.Student;
 using Applications.Shared;
+using Domain.Enums;
 
 namespace Applications.Interfaces.Services
 {
     public interface IStudentService
     {
-        Task<Result<int>> AddAsync(StudentDto studentDto);
+        Task<Result<IReadOnlyCollection<StudentResponse>>> GetListAsync();
+        Task<Result<StudentResponse>> GetByIdAsync(int id);
+        Task<Result<StudentResponse>> GetByStudentNumberAsync(string studentNumber);
         Task<Result> DeleteAsync(int id);
-        Task<Result> DeleteAsync(string lastName);
-        Task<Result> DoesExistAsync(int id);
-        Task<Result> DoesExistAsync(string lastName);
-        Task<Result<IReadOnlyCollection<StudentDto>>> GetAllAsync();
-        Task<Result<StudentDto>> GetByIdAsync(int id);
-        Task<Result<StudentDto>> GetByNameAsync(string lastName);
-        Task<Result> UpdateAsync(StudentDto studentDto);
+        Task<Result> DeleteAsync(string studentNumber);
+        Task<bool> DoesExistAsync(int id);
+        Task<bool> DoesExistAsync(string studentNumber);
+        Task<Result<StudentResponse>> AddAsync(StudentRequest? request);
+        Task<Result> UpdateAsync(int id, StudentRequest? request);
+        Task<Result> UpdateStudentStatusAsync(int id, UpdateStudentStatusRequest? request);
     }
 }
