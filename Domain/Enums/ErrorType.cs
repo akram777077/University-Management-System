@@ -4,6 +4,7 @@
     {
         NotFound,
         BadRequest,
-        InternalServerError
+        InternalServerError,
+        Conflict
     };
 }
