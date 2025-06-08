@@ -1,6 +1,6 @@
 ﻿namespace Applications.DTOs
 {
-    public class CountryResponse
+    public record struct CountryResponse
     {
         public int Id { get; set; }
         public required string Name { get; set; }
