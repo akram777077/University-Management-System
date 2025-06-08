@@ -1,4 +1,4 @@
-﻿using Applications.DTOs;
+﻿using Applications.DTOs.Student;
 using AutoMapper;
 using Domain.Entities;
 
@@ -8,13 +8,16 @@ namespace Applications.Mappers
     {
         partial void ApplyStudentMapping()
         {
-            CreateMap<Student, StudentDto>().ReverseMap();
+            CreateMap<Student, StudentResponse>()
+           .ForMember(dest => dest.PersonFullName,
+               opt => opt.MapFrom(src => src.Person != null
+                   ? $"{src.Person.FirstName} {src.Person.LastName}"
+                   : string.Empty));
 
-            CreateMap<StudentDto, Student>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<StudentDto, Student>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<StudentRequest, Student>()
+                .ForMember(dest => dest.Person, opt => opt.Ignore())
+                .ForMember(dest => dest.Notes, 
+                    opt => opt.Condition(src => !string.IsNullOrEmpty(src.Notes)));
         }
     }
 }
