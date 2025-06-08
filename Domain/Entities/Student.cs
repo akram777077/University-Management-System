@@ -1,16 +1,21 @@
-﻿namespace Domain.Entities
+﻿using Domain.Enums;
+using Domain.Interfaces;
+
+namespace Domain.Entities
 {
-    public class Student
+    /// <summary>
+    /// Student entity extending Person with academic-specific properties. Manages enrollment status and academic progression.
+    /// </summary>
+    public class Student : IEntity
     {
         public int Id { get; set; }
-        public string? FName { get; set; }
-        public string? LName { get; set; }
+        public required string StudentNumber { get; set; }
+        public StudentStatus StudentStatus { get; set; } 
+        public DateTime EnrollmentDate { get; set; }
+        public DateTime? ExpectedGradDate { get; set; }
+        public string? Notes { get; set; }
 
-        public ICollection<Section> Sections { get; set; } = new List<Section>();
-
-        public override string ToString()
-        {
-            return $"{LName} {FName}";
-        }
+        public int PersonId { get; set; }
+        public Person Person { get; set; } = null!;
     }
 }

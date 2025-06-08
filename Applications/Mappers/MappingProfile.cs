@@ -7,10 +7,14 @@ namespace Applications.Mappers
         public MappingProfile()
         {
             ApplyStudentMapping();
+            ApplyCountryMapping();
+            ApplyPersonMapping();
         }
 
         //Method signatures
         partial void ApplyStudentMapping();
+        partial void ApplyCountryMapping();
+        partial void ApplyPersonMapping();
     }
 
   

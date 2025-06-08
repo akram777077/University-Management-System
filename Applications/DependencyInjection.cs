@@ -1,4 +1,5 @@
-﻿using Applications.Interfaces.Services;
+﻿using Applications.Interfaces.Repositories;
+using Applications.Interfaces.Services;
 using Applications.Mappers;
 using Applications.Services;
 using Applications.Utilities;
@@ -12,8 +13,10 @@ namespace Applications
         {
             services.AddAutoMapper(typeof(MappingProfile));
 
-            services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IMyLogger, MyLogger>();
+            services.AddScoped<ICountryService, CountryService>();
+            services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<IStudentService, StudentService>();
 
             return services;
         }
