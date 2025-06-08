@@ -10,8 +10,8 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public required string StudentNumber { get; set; }
-        public StudentStatus StudentStatus { get; set; } = StudentStatus.Active;
-        public DateTime EnrollmentDate { get; set; } = DateTime.UtcNow;
+        public StudentStatus StudentStatus { get; set; } 
+        public DateTime EnrollmentDate { get; set; }
         public DateTime? ExpectedGradDate { get; set; }
         public string? Notes { get; set; }
 
