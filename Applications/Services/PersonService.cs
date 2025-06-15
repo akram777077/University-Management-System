@@ -26,18 +26,21 @@ namespace Applications.Services
         {
             if (request == null)
                 return Result<PersonResponse>.Failure("Student information is required", ErrorType.BadRequest);
-
+            
+            bool isExists = await _repository.DoesExistAsync(request.Value.LastName);
+            if(!isExists)
+                return Result<PersonResponse>.Failure("Person already exists", ErrorType.Conflict);
+            
             var person = _mapper.Map<Person>(request);
-
+            
             try
             {
                 await _repository.AddAsync(person);
-
+            
                 if (person.Id <= 0)
                     return Result<PersonResponse>.Failure("Failed to create new person record", ErrorType.BadRequest);
 
                 var response = _mapper.Map<PersonResponse>(person);
-
                 return Result<PersonResponse>.Success(response);
             }
             catch (Exception ex)
@@ -127,22 +130,17 @@ namespace Applications.Services
             if (id <= 0 || request == null)
                 return Result.Failure("Person information is required for update", ErrorType.BadRequest);
 
-            var isFound = await DoesExistAsync(id);
+            var person = await _repository.GetByIdAsync(id);
+            if (person == null)
+                return Result.Failure("Person Already Exists", ErrorType.Conflict);
 
-            if (!isFound.IsSuccess)
-                return Result.Failure(isFound.Error, isFound.ErrorType);
-
-            var person = _mapper.Map<Person>(request);
+            _mapper.Map(request.Value, person);
             person.Id = id;
 
             try
             {
                 bool isUpdated = await _repository.UpdateAsync(person);
-
-                if (!isUpdated)
-                    return Result.Failure($"Failed to update person", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update person", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -191,48 +189,6 @@ namespace Applications.Services
             {
                 _logger.LogError("Database error deleting person", ex, new { lastName });
                 return Result.Failure("Failed to delete person due to a system error", ErrorType.InternalServerError);
-            }
-        }
-
-        public async Task<Result> DoesExistAsync(int id)
-        {
-            if (id <= 0)
-                return Result.Failure("Invalid person ID provided", ErrorType.BadRequest);
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(id);
-
-                if (!isFound)
-                    return Result.Failure("Person not found with the specified ID", ErrorType.NotFound);
-
-                return Result.Success;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking person existence", ex, new { id });
-                return Result.Failure("Failed to verify person existence due to a system error", ErrorType.InternalServerError);
-            }
-        }
-
-        public async Task<Result> DoesExistAsync(string lastName)
-        {
-            if (string.IsNullOrEmpty(lastName))
-                return Result.Failure("Last name is required", ErrorType.BadRequest);
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(lastName);
-
-                if (!isFound)
-                    return Result.Failure("Person not found with the specified last name", ErrorType.NotFound);
-                
-                return Result.Success;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking person existence", ex, new { lastName });
-                return Result.Failure("Failed to verify person existence due to a system error", ErrorType.InternalServerError);
             }
         }
     }

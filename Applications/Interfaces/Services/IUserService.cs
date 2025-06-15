@@ -9,8 +9,6 @@ namespace Applications.Interfaces.Services
         Task<Result> ChangePasswordAsync(int id, ChangePasswordRequest? request);
         Task<Result> DeleteAsync(int id);
         Task<Result> DeleteAsync(string username);
-        Task<bool> DoesExistAsync(int id);
-        Task<bool> DoesExistAsync(string username);
         Task<Result<UserResponse>> GetByIdAsync(int id);
         Task<Result<UserResponse>> GetByUsernameAsync(string username);
         Task<Result<IReadOnlyCollection<UserResponse>>> GetListAsync();

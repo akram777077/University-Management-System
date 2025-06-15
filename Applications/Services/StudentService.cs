@@ -1,5 +1,4 @@
-﻿using Applications.DTOs.People;
-using Applications.DTOs.Student;
+﻿using Applications.DTOs.Student;
 using Applications.Helpers;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
@@ -53,13 +52,11 @@ namespace Applications.Services
             if (request == null)
                 return Result<StudentResponse>.Failure("Student information is required", ErrorType.BadRequest);
 
-            var isExist = await DoesExistAsync(request.Value.PersonId);
-
-            if (isExist)
+            var isExist = await _repository.DoesExistAsync(request.Value.PersonId);
+            if (!isExist)
                 return Result<StudentResponse>.Failure("Student already exists", ErrorType.Conflict);
 
             var student = _mapper.Map<Student>(request);
-
             student.StudentNumber = student.GenerateStudentNumber();
 
             try
@@ -70,7 +67,6 @@ namespace Applications.Services
                     return Result<StudentResponse>.Failure("Failed to create new student record", ErrorType.BadRequest);
 
                 var response = _mapper.Map<StudentResponse>(student);
-
                 return Result<StudentResponse>.Success(response);
             }
             catch (Exception ex)
@@ -85,17 +81,17 @@ namespace Applications.Services
             if (request == null)
                 return Result.Failure("Student information is required for update", ErrorType.BadRequest);
 
-            var student = _mapper.Map<Student>(request);
+            var student = await _repository.GetByIdAsync(id);
+            if (student == null)
+                return Result.Failure("Student Not Found", ErrorType.NotFound);
+
+            _mapper.Map(request.Value, student);
             student.Id = id;
 
             try
             {
                 bool isUpdated = await _repository.UpdateAsync(student);
-
-                if (!isUpdated)
-                    return Result.Failure($"Failed to update student", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update student", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -112,18 +108,13 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(id);
-
-                if (!isDeleted)
-                    return Result.Failure("Student not found", ErrorType.NotFound);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("Student not found", ErrorType.NotFound) : Result.Success;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Database error deleting student", ex, new { id });
                 return Result.Failure("Failed to delete student due to a system error", ErrorType.InternalServerError);
             }
-
         }
 
         public async Task<Result> DeleteAsync(string studentNumber)
@@ -134,11 +125,7 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(studentNumber);
-
-                if (!isDeleted)
-                    return Result.Failure("Student not found", ErrorType.NotFound);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("Student not found", ErrorType.NotFound) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -146,49 +133,7 @@ namespace Applications.Services
                 return Result.Failure("Failed to delete student due to a system error", ErrorType.InternalServerError);
             }
         }
-
-        public async Task<bool> DoesExistAsync(int id)
-        {
-            if (id <= 0)
-                return false;
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(id);
-
-                if (!isFound)
-                    return false;
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking student existence", ex, new { id });
-                return false;
-            }
-        }
-
-        public async Task<bool> DoesExistAsync(string studentNumber)
-        {
-            if (string.IsNullOrEmpty(studentNumber))
-                return false;
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(studentNumber);
-
-                if (!isFound)
-                    return false;
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking student existence", ex, new { studentNumber });
-                return false;
-            }
-        }
-
+        
         public async Task<Result<StudentResponse>> GetByIdAsync(int id)
         {
             if (id <= 0)
@@ -202,7 +147,6 @@ namespace Applications.Services
                     return Result<StudentResponse>.Failure("Student not found with the specified ID", ErrorType.NotFound);
 
                 var response = _mapper.Map<StudentResponse>(student);
-
                 return Result<StudentResponse>.Success(response);
             }
             catch (Exception ex)
@@ -253,16 +197,11 @@ namespace Applications.Services
                     return Result.Failure($"Student not found", ErrorType.NotFound);
 
                 student.StudentStatus = status.Value.StudentStatus;
-
                 student.Notes = string.IsNullOrEmpty(status.Value.Notes) 
                     ? student.Notes : status.Value.Notes;
 
                 var isUpdated = await _repository.UpdateAsync(student);
-
-                if(!isUpdated)
-                    return Result.Failure($"Failed to update student status", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update student status", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {

@@ -11,8 +11,6 @@ namespace Applications.Interfaces.Services
         Task<Result<StudentResponse>> GetByStudentNumberAsync(string studentNumber);
         Task<Result> DeleteAsync(int id);
         Task<Result> DeleteAsync(string studentNumber);
-        Task<bool> DoesExistAsync(int id);
-        Task<bool> DoesExistAsync(string studentNumber);
         Task<Result<StudentResponse>> AddAsync(StudentRequest? request);
         Task<Result> UpdateAsync(int id, StudentRequest? request);
         Task<Result> UpdateStudentStatusAsync(int id, UpdateStudentStatusRequest? request);

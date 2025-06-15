@@ -102,8 +102,7 @@ namespace Applications.Services
             if (request == null)
                 return Result<UserResponse>.Failure("User information is required", ErrorType.BadRequest);
 
-            var isExist = await DoesExistAsync(request.Value.PersonId);
-
+            var isExist = await _repository.DoesExistAsync(request.Value.PersonId);
             if (isExist)
                 return Result<UserResponse>.Failure("User already exists", ErrorType.Conflict);
 
@@ -113,12 +112,10 @@ namespace Applications.Services
             try
             {
                 int id = await _repository.AddAsync(user);
-
                 if (id <= 0)
                     return Result<UserResponse>.Failure("Failed to create new user record", ErrorType.BadRequest);
 
                 var response = _mapper.Map<UserResponse>(user);
-
                 return Result<UserResponse>.Success(response);
             }
             catch (Exception ex)
@@ -177,7 +174,6 @@ namespace Applications.Services
                 return Result.Failure("User information is required for update", ErrorType.BadRequest);
 
             var user = await _repository.GetByIdAsync(id);
-
             if (user == null)
                 return Result.Failure("User not found", ErrorType.NotFound);
 
@@ -196,48 +192,6 @@ namespace Applications.Services
             {
                 _logger.LogError("Database error updating user", ex, new { request });
                 return Result.Failure("Failed to update user due to a system error", ErrorType.InternalServerError);
-            }
-        }
-
-        public async Task<bool> DoesExistAsync(int id)
-        {
-            if (id <= 0)
-                return false;
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(id);
-
-                if (!isFound)
-                    return false;
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking user existence", ex, new { id });
-                return false;
-            }
-        }
-
-        public async Task<bool> DoesExistAsync(string username)
-        {
-            if (string.IsNullOrEmpty(username))
-                return false;
-
-            try
-            {
-                var isFound = await _repository.DoesExistAsync(username);
-
-                if (!isFound)
-                    return false;
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Database error checking user existence", ex, new { username });
-                return false;
             }
         }
 
