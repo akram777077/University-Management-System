@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
 using Applications.Interfaces.Services;
 using Applications.DTOs.Student;
+using Applications.DTOs.Users;
 
 namespace Presentation.Controllers
 {
@@ -21,7 +22,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<StudentRequest>>> GetList()
+        public async Task<ActionResult<IEnumerable<StudentResponse>>> GetList()
         {
             var result = await _service.GetListAsync();
 
