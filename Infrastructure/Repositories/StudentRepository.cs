@@ -30,6 +30,11 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<bool> DoesExistAsync(int personId)
+        {
+            return await _context.Students.AnyAsync(x => x.PersonId == personId);
+        }
+        
         public override async Task<Student?> GetByIdAsync(int id)
         {
             return await _context.Students
@@ -44,11 +49,6 @@ namespace Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(p => p.Person)
                 .FirstOrDefaultAsync(n => n.StudentNumber == studentNumber);
-        }
-
-        public async Task<bool> DoesExistAsync(string studentNumber)
-        {
-            return await _context.Students.AnyAsync(n => n.StudentNumber == studentNumber);
         }
     }
 }

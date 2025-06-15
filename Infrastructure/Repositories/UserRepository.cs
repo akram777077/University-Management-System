@@ -24,12 +24,12 @@ namespace Infrastructure.Repositories
             _context.Users.Remove(user);
             return await _context.SaveChangesAsync() > 0;
         }
-
-        public async Task<bool> DoesExistAsync(string username)
+        
+        public async Task<bool> DoesExistAsync(int personId)
         {
-            return await _context.Users.AnyAsync(n => n.Username == username);
+            return await _context.Students.AnyAsync(x => x.PersonId == personId);
         }
-
+        
         public async Task<User?> GetByUsernameAsync(string username)
         {
             return await _context.Users

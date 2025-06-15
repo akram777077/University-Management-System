@@ -31,10 +31,10 @@ namespace Infrastructure.Repositories
                 .Include(c => c.Country)
                 .FirstOrDefaultAsync(n => n.LastName == lastName);
         }
-
+        
         public async Task<bool> DoesExistAsync(string lastName)
         {
-            return await _context.People.AnyAsync(n => n.LastName == lastName);
+            return await _context.People.AnyAsync(x => x.LastName == lastName);
         }
 
         public override async Task<Person?> GetByIdAsync(int id)

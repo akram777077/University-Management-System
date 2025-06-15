@@ -51,10 +51,5 @@ namespace Infrastructure.Repositories.Base
             _context.Set<TEntity>().Update(entity);
             return await _context.SaveChangesAsync() > 0;
         }
-
-        public virtual async Task<bool> DoesExistAsync(int id)
-        {
-            return await _context.Set<TEntity>().AnyAsync(x => x.Id == id);
-        }
     }
 }
