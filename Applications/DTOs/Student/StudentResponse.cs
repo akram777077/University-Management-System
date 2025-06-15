@@ -6,7 +6,7 @@ namespace Applications.DTOs.Student
     {
         public int Id { get; set; }
         public required string StudentNumber { get; set; }
-        public StudentStatus StudentStatus { get; set; }
+        public string Status { get; set; }
         public DateTime EnrollmentDate { get; set; } 
         public DateTime? ExpectedGradDate { get; set; }
 

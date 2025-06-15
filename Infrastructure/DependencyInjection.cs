@@ -20,6 +20,7 @@ namespace Infrastructure
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

@@ -1,18 +1,18 @@
+﻿using Applications.DTOs.Users;
+using Applications.Helpers;
+using Applications.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
-using Applications.Interfaces.Services;
-using Applications.DTOs.Student;
-using Applications.DTOs.Users;
 
 namespace Presentation.Controllers
 {
-    [Route("api/students")]
+    [Route("api/users")]
     [ApiController]
-    public class StudentsController : ControllerBase
+    public class UsersController : ControllerBase
     {
-        private readonly IStudentService _service;
+        private readonly IUserService _service;
 
-        public StudentsController(IStudentService service)
+        public UsersController(IUserService service)
         {
             _service = service;
         }
@@ -22,11 +22,11 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<StudentResponse>>> GetList()
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetList()
         {
             var result = await _service.GetListAsync();
 
-            if(!result.IsSuccess)
+            if (!result.IsSuccess)
                 return result.HandleResult();
 
             return Ok(result.Value);
@@ -38,7 +38,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentResponse>> GetById(int id)
+        public async Task<ActionResult<UserResponse>> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
 
@@ -50,13 +50,13 @@ namespace Presentation.Controllers
 
 
 
-        [HttpGet("by-number/{number}")]
+        [HttpGet("by-username/{username}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentResponse>> GetByStudentNumber(string number)
+        public async Task<ActionResult<UserResponse>> GetByUsername(string username)
         {
-            var result = await _service.GetByStudentNumberAsync(number);
+            var result = await _service.GetByUsernameAsync(username);
 
             if (!result.IsSuccess)
                 return result.HandleResult();
@@ -70,7 +70,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentResponse>> Create(StudentRequest? request)
+        public async Task<ActionResult<UserResponse>> Create(CreateUserRequest? request)
         {
             var response = await _service.AddAsync(request);
 
@@ -97,14 +97,14 @@ namespace Presentation.Controllers
         }
 
 
-        [HttpDelete("by-number/{number}")]
+        [HttpDelete("by-username/{username}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Delete(string number)
+        public async Task<ActionResult> Delete(string username)
         {
-            var response = await _service.DeleteAsync(number);
+            var response = await _service.DeleteAsync(username);
 
             if (!response.IsSuccess)
                 return response.HandleResult();
@@ -118,7 +118,7 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Update(int id, StudentRequest? request)
+        public async Task<ActionResult> Update(int id, UpdateUserRequest? request)
         {
             var response = await _service.UpdateAsync(id, request);
 
@@ -128,19 +128,35 @@ namespace Presentation.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}/status")]
+
+        [HttpPatch("{id}/role")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Patch(int id, UpdateStudentStatusRequest? status)
+        public async Task<ActionResult> UpdateUserRole(int id, UpdateUserRoleRequest? request)
         {
-            var response = await _service.UpdateStudentStatusAsync(id, status);
+            var response = await _service.UpdateUserRoleAsync(id, request);
 
             if (!response.IsSuccess)
                 return response.HandleResult();
 
             return NoContent();
         }
-    }   
+
+        [HttpPatch("{id}/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> ChangePassword(int id, ChangePasswordRequest? request)
+        {
+            var response = await _service.ChangePasswordAsync(id, request);
+
+            if (!response.IsSuccess)
+                return response.HandleResult();
+
+            return NoContent();
+        }
+    }
 }

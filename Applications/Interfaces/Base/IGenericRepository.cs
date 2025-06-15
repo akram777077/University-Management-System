@@ -9,6 +9,5 @@ namespace Applications.Interfaces.Base
         Task<int> AddAsync(TEntity entity);
         Task<bool> UpdateAsync(TEntity entity);
         Task<bool> DeleteAsync(int id);
-        Task<bool> DoesExistAsync(int id);
     }
 }
