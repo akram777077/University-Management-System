@@ -9,12 +9,14 @@ namespace Applications.Mappers
             ApplyStudentMapping();
             ApplyCountryMapping();
             ApplyPersonMapping();
+            ApplyUserMapping();
         }
 
         //Method signatures
         partial void ApplyStudentMapping();
         partial void ApplyCountryMapping();
         partial void ApplyPersonMapping();
+        partial void ApplyUserMapping();
     }
 
   
