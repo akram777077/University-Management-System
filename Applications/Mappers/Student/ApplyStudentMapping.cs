@@ -9,8 +9,10 @@ namespace Applications.Mappers
         partial void ApplyStudentMapping()
         {
             CreateMap<Student, StudentResponse>()
+           .ForMember(dest => dest.Status, 
+                opt => opt.MapFrom(src => src.StudentStatus.ToString()))
            .ForMember(dest => dest.PersonFullName,
-               opt => opt.MapFrom(src => src.Person != null
+                opt => opt.MapFrom(src => src.Person != null
                    ? $"{src.Person.FirstName} {src.Person.LastName}"
                    : string.Empty));
 
