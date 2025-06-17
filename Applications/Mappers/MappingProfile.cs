@@ -10,6 +10,7 @@ namespace Applications.Mappers
             ApplyCountryMapping();
             ApplyPersonMapping();
             ApplyUserMapping();
+            ApplyProfessorMapping();
         }
 
         //Method signatures
@@ -17,6 +18,7 @@ namespace Applications.Mappers
         partial void ApplyCountryMapping();
         partial void ApplyPersonMapping();
         partial void ApplyUserMapping();
+        partial void ApplyProfessorMapping();
     }
 
   
