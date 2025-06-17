@@ -57,7 +57,7 @@ namespace Applications.Services
                 return Result<StudentResponse>.Failure("Student already exists", ErrorType.Conflict);
 
             var student = _mapper.Map<Student>(request);
-            student.StudentNumber = student.GenerateStudentNumber();
+            student.StudentNumber = student.GenerateUniqueNumber();
 
             try
             {

@@ -2,9 +2,9 @@
 
 namespace Applications.Helpers
 {
-    public static class StudentNumberGeneretor
+    public static class UniqueNumberGenerator
     {
-        public static string GenerateStudentNumber(this Student student) 
+        public static string GenerateUniqueNumber<T>(this T entity) 
             => Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
     }
 }
