@@ -21,6 +21,7 @@ namespace Infrastructure
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IProfessorRepository, ProfessorRepository>();
 
             return services;
         }
