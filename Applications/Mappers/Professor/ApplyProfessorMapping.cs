@@ -18,6 +18,13 @@ public partial class MappingProfile : Profile
                     : string.Empty));
 
         CreateMap<ProfessorRequest, Professor>()
-            .ForMember(dest => dest.Person, opt => opt.Ignore());
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.AcademicRank, opt => opt.Condition(src => src.AcademicRank.HasValue))
+            .ForMember(dest => dest.HireDate, opt => opt.Condition(src => src.HireDate.HasValue))
+            .ForMember(dest => dest.Specialization, opt => opt.Condition(src => src.Specialization != null))
+            .ForMember(dest => dest.OfficeLocation, opt => opt.Condition(src => src.OfficeLocation != null))
+            .ForMember(dest => dest.Salary, opt => opt.Condition(src => src.Salary.HasValue))
+            .ForMember(dest => dest.IsActive, opt => opt.Condition(src => src.IsActive.HasValue))
+            .ForMember(dest => dest.PersonId, opt => opt.Condition(src => src.PersonId != 0));
     }
 }

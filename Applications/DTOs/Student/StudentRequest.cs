@@ -1,16 +1,13 @@
 ﻿using Domain.Enums;
 
-namespace Applications.DTOs.Student
+namespace Applications.DTOs.Student;
+
+public record struct StudentRequest
 {
-    public record struct StudentRequest
-    {
-        public string StudentNumber { get; set; } = string.Empty;
-        public StudentStatus StudentStatus { get; set; }
-        public DateTime EnrollmentDate { get; set; } 
-        public DateTime? ExpectedGradDate { get; set; } 
-        public string? Notes { get; set; }
-        public int PersonId { get; set; }
-    
-        public StudentRequest() { }
-    }
+    public string? StudentNumber { get; set; }
+    public StudentStatus? StudentStatus { get; set; }
+    public DateTime? EnrollmentDate { get; set; } 
+    public DateTime? ExpectedGradDate { get; set; } 
+    public string? Notes { get; set; }
+    public int PersonId { get; set; }
 }

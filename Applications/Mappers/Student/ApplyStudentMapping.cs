@@ -17,9 +17,13 @@ namespace Applications.Mappers
                    : string.Empty));
 
             CreateMap<StudentRequest, Student>()
-                .ForMember(dest => dest.Person, opt => opt.Ignore())
-                .ForMember(dest => dest.Notes, 
-                    opt => opt.Condition(src => !string.IsNullOrEmpty(src.Notes)));
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.StudentNumber, opt => opt.Condition(src => src.StudentNumber != null))
+                .ForMember(dest => dest.StudentStatus, opt => opt.Condition(src => src.StudentStatus.HasValue))
+                .ForMember(dest => dest.EnrollmentDate, opt => opt.Condition(src => src.EnrollmentDate.HasValue))
+                .ForMember(dest => dest.ExpectedGradDate, opt => opt.Condition(src => src.ExpectedGradDate.HasValue))
+                .ForMember(dest => dest.Notes, opt => opt.Condition(src => src.Notes != null))
+                .ForMember(dest => dest.PersonId, opt => opt.Condition(src => src.PersonId != 0));
         }
     }
 }
