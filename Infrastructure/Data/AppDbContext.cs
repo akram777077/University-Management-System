@@ -10,6 +10,7 @@ namespace Infrastructure.Data
         public DbSet<Country> Countries { get; set; }  
         public DbSet<User> Users { get; set; }
         public DbSet<Professor> Professors { get; set; }
+        public DbSet<ServiceOffer> ServiceOffers { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
