@@ -18,7 +18,8 @@ namespace Applications
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IProfessorService, ProfessorService>();
-
+            services.AddScoped<IServiceOfferService, ServiceOfferService>();
+            
             return services;
         }
     }
