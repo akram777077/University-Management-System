@@ -11,6 +11,7 @@ namespace Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Professor> Professors { get; set; }
         public DbSet<ServiceOffer> ServiceOffers { get; set; }
+        public DbSet<Program> Programs { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
