@@ -12,6 +12,7 @@ namespace Applications.Mappers
             ApplyUserMapping();
             ApplyProfessorMapping();
             ApplyServiceOfferMapping();
+            ApplyProgramMapping();
         }
 
         //Method signatures
@@ -21,6 +22,7 @@ namespace Applications.Mappers
         partial void ApplyUserMapping();
         partial void ApplyProfessorMapping();
         partial void ApplyServiceOfferMapping();
+        partial void ApplyProgramMapping();
     }
 
   
