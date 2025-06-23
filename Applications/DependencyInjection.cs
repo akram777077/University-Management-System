@@ -20,6 +20,7 @@ namespace Applications
             services.AddScoped<IProfessorService, ProfessorService>();
             services.AddScoped<IServiceOfferService, ServiceOfferService>();
             services.AddScoped<IProgramService, ProgramService>();
+            services.AddScoped<IServiceApplicationService, ServiceApplicationService>();
             
             return services;
         }
