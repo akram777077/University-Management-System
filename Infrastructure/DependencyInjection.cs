@@ -24,6 +24,7 @@ namespace Infrastructure
             services.AddScoped<IProfessorRepository, ProfessorRepository>();
             services.AddScoped<IServiceOfferRepository, ServiceOfferRepository>();
             services.AddScoped<IProgramRepository, ProgramRepository>();
+            services.AddScoped<IServiceApplicationRepository, ServiceApplicationRepository>();
 
             return services;
         }
