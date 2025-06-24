@@ -14,6 +14,7 @@ namespace Applications.Mappers
             ApplyServiceOfferMapping();
             ApplyProgramMapping();
             ApplyServiceApplicationMapping();
+            ApplyDocsVerificationMapping();
         }
 
         //Method signatures
@@ -25,6 +26,7 @@ namespace Applications.Mappers
         partial void ApplyServiceOfferMapping();
         partial void ApplyProgramMapping();
         partial void ApplyServiceApplicationMapping();
+        partial void ApplyDocsVerificationMapping();
     }
 
   
