@@ -21,6 +21,8 @@ namespace Applications
             services.AddScoped<IServiceOfferService, ServiceOfferService>();
             services.AddScoped<IProgramService, ProgramService>();
             services.AddScoped<IServiceApplicationService, ServiceApplicationService>();
+            services.AddScoped<IDocsVerificationService, DocsVerificationService>();
+            
             
             return services;
         }
