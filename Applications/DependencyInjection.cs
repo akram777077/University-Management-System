@@ -23,6 +23,7 @@ namespace Applications
             services.AddScoped<IServiceApplicationService, ServiceApplicationService>();
             services.AddScoped<IDocsVerificationService, DocsVerificationService>();
             services.AddScoped<IEntranceExamService, EntranceExamService>();
+            services.AddScoped<IInterviewService, InterviewService>();
             
             
             return services;
