@@ -131,10 +131,6 @@ public class ServiceApplicationService : IServiceApplicationService
                 return Result.Failure("Application not found", ErrorType.NotFound);
 
             _mapper.Map(request.Value, existingApp);
-            existingApp.Person = null;
-            existingApp.ServiceOffer = null;
-            existingApp.ProcessedByUser = null;
-            
             bool isUpdated = await _repository.UpdateAsync(existingApp);
             return !isUpdated ? Result.Failure("Failed to update application", ErrorType.BadRequest) : Result.Success;
         }
