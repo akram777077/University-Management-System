@@ -15,6 +15,7 @@ namespace Infrastructure.Data
         public DbSet<ServiceApplication> ServiceApplications { get; set; }
         public DbSet<DocsVerification> DocsVerifications { get; set; }
         public DbSet<EntranceExam> EntranceExams { get; set; }
+        public DbSet<Interview> Interviews { get; set; }
         
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
