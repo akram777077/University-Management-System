@@ -27,6 +27,7 @@ namespace Infrastructure
             services.AddScoped<IServiceApplicationRepository, ServiceApplicationRepository>();
             services.AddScoped<IDocsVerificationRepository, DocsVerificationRepository>();
             services.AddScoped<IEntranceExamRepository, EntranceExamRepository>();
+            services.AddScoped<IInterviewRepository, InterviewRepository>();
 
             return services;
         }
