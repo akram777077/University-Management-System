@@ -16,6 +16,7 @@ namespace Infrastructure.Data
         public DbSet<DocsVerification> DocsVerifications { get; set; }
         public DbSet<EntranceExam> EntranceExams { get; set; }
         public DbSet<Interview> Interviews { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
         
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
