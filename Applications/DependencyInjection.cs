@@ -1,4 +1,5 @@
-﻿using Applications.Interfaces.Services;
+﻿using Applications.Interfaces.Repositories;
+using Applications.Interfaces.Services;
 using Applications.Mappers;
 using Applications.Services;
 using Applications.Utilities;
@@ -24,6 +25,7 @@ namespace Applications
             services.AddScoped<IDocsVerificationService, DocsVerificationService>();
             services.AddScoped<IEntranceExamService, EntranceExamService>();
             services.AddScoped<IInterviewService, InterviewService>();
+            services.AddScoped<IEnrollmentService, EnrollmentService>();
             
             
             return services;
