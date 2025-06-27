@@ -34,7 +34,12 @@ namespace Infrastructure.Repositories
         {
             return await _context.Students.AnyAsync(x => x.PersonId == personId);
         }
-        
+
+        public async Task<bool> DoesExistsAsync(int id)
+        {
+            return await _context.Students.AnyAsync(x => x.Id == id);
+        }
+
         public override async Task<Student?> GetByIdAsync(int id)
         {
             return await _context.Students
