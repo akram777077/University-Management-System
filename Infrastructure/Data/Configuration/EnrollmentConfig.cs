@@ -20,10 +20,14 @@ public class EnrollmentConfig: IEntityTypeConfiguration<Enrollment>
                 .HasColumnName("enrollment_date")
                 .HasColumnType("date");
 
-            builder.Property(e => e.GraduationDate)
-                .HasColumnName("graduation_date")
+            builder.Property(e => e.ActualGradDate)
+                .HasColumnName("actual_grad_date")
                 .HasColumnType("date");
 
+            builder.Property(e => e.Status)
+                .HasColumnName("enrollment_status")
+                .HasConversion<int>();
+            
             builder.Property(e => e.Notes)
                 .HasColumnName("notes")
                 .HasColumnType("varchar")
