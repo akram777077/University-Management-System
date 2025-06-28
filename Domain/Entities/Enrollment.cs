@@ -1,3 +1,4 @@
+using Domain.Enums;
 using Domain.Interfaces;
 
 namespace Domain.Entities;
@@ -9,7 +10,8 @@ public class Enrollment : IEntity
 {
     public int Id { get; set; }
     public DateTime EnrollmentDate { get; set; }
-    public DateTime? GraduationDate { get; set; }
+    public DateTime? ActualGradDate { get; set; }
+    public EnrollmentStatus Status { get; set; } 
     public string? Notes { get; set; }
     
     public int StudentId { get; set; }  
