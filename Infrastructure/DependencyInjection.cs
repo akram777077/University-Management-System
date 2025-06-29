@@ -1,6 +1,8 @@
 ﻿using Applications.Interfaces.Repositories;
+using Applications.Interfaces.UnitOfWorks;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +31,11 @@ namespace Infrastructure
             services.AddScoped<IEntranceExamRepository, EntranceExamRepository>();
             services.AddScoped<IInterviewRepository, InterviewRepository>();
             services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
-
+            
+            //Unit of work pattern
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
+            
             return services;
         }
     }
