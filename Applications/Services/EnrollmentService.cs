@@ -7,30 +7,19 @@ using Domain.Entities;
 using Domain.Enums;
 using Applications.Helpers;
 using Applications.Interfaces.Services;
+using Applications.Interfaces.UnitOfWorks;
 
 namespace Applications.Services;
 
 public class EnrollmentService : IEnrollmentService
 {
-    private readonly IEnrollmentRepository _repository;
-    private readonly IStudentRepository _studentRepository;
-    private readonly IProgramRepository _programRepository;
-    private readonly IServiceApplicationRepository _serviceAppRepository;
+    private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
     private readonly IMyLogger _logger;
 
-    public EnrollmentService(
-        IEnrollmentRepository repository,
-        IStudentRepository studentRepository,
-        IProgramRepository programRepository,
-        IServiceApplicationRepository serviceAppRepository,
-        IMapper mapper,
-        IMyLogger logger)
+    public EnrollmentService(IUnitOfWork uow, IMapper mapper, IMyLogger logger)
     {
-        _repository = repository;
-        _studentRepository = studentRepository;
-        _programRepository = programRepository;
-        _serviceAppRepository = serviceAppRepository;
+        _uow = uow;
         _mapper = mapper;
         _logger = logger;
     }
@@ -39,7 +28,7 @@ public class EnrollmentService : IEnrollmentService
     {
         try
         {
-            var enrollments = await _repository.GetListAsync();
+            var enrollments = await _uow.Enrollments.GetListAsync();
             if (!enrollments.Any())
             {
                 return Result<IReadOnlyCollection<EnrollmentResponse>>.Failure(
@@ -64,7 +53,7 @@ public class EnrollmentService : IEnrollmentService
 
         try
         {
-            var enrollment = await _repository.GetByIdAsync(id);
+            var enrollment = await _uow.Enrollments.GetByIdAsync(id);
             if (enrollment == null)
                 return Result<EnrollmentResponse>.Failure("Enrollment not found", ErrorType.NotFound);
 
@@ -86,7 +75,7 @@ public class EnrollmentService : IEnrollmentService
 
         try
         {
-            var enrollment = await _repository.GetByStudentIdAsync(studentId);
+            var enrollment = await _uow.Enrollments.GetByStudentIdAsync(studentId);
             if (enrollment == null)
                 return Result<EnrollmentResponse>.Failure("Enrollment not found for this student", ErrorType.NotFound);
 
@@ -105,19 +94,18 @@ public class EnrollmentService : IEnrollmentService
     {
         if (request == default)
             return Result<EnrollmentResponse>.Failure("Enrollment data is required", ErrorType.BadRequest);
-
-        var validationResult = await request.ValidateRelationships(
-            _studentRepository, _programRepository, _serviceAppRepository);
         
-        if (!validationResult.IsSuccess)
-            return Result<EnrollmentResponse>.Failure(validationResult.Error, validationResult.ErrorType);
-
         try
         {
+            var canStudentEnroll  = await request.ValidateForEnrollmentAsync(_uow);
+        
+            if (!canStudentEnroll .IsSuccess)
+                return Result<EnrollmentResponse>.Failure(canStudentEnroll.Error, canStudentEnroll.ErrorType);
+            
             var enrollment = _mapper.Map<Enrollment>(request);
             enrollment.EnrollmentDate = DateTime.UtcNow;
 
-            int id = await _repository.AddAsync(enrollment);
+            int id = await _uow.Enrollments.AddAsync(enrollment);
             if (id <= 0)
                 return Result<EnrollmentResponse>.Failure("Failed to create enrollment", ErrorType.BadRequest);
 
@@ -138,15 +126,14 @@ public class EnrollmentService : IEnrollmentService
 
         try
         {
-            var existingEnrollment = await _repository.GetByIdAsync(id);
+            var existingEnrollment = await _uow.Enrollments.GetByIdAsync(id);
             if (existingEnrollment == null)
                 return Result.Failure("Enrollment not found", ErrorType.NotFound);
 
             // Validate relationships if they're being updated
             if (request.StudentId.HasValue || request.ProgramId.HasValue || request.ServiceApplicationId.HasValue)
             {
-                var validationResult = await request.ValidateRelationships(
-                    _studentRepository, _programRepository, _serviceAppRepository);
+                var validationResult = await request.ValidatePrerequisitesAsync(_uow);
                 
                 if (!validationResult.IsSuccess)
                     return Result.Failure(validationResult.Error, validationResult.ErrorType);
@@ -154,7 +141,7 @@ public class EnrollmentService : IEnrollmentService
 
             _mapper.Map(request, existingEnrollment);
             existingEnrollment.Id = id;
-            bool isUpdated = await _repository.UpdateAsync(existingEnrollment);
+            bool isUpdated = await _uow.Enrollments.UpdateAsync(existingEnrollment);
             return !isUpdated ? Result.Failure("Failed to update enrollment", ErrorType.BadRequest) : Result.Success;
         }
         catch (Exception ex)
@@ -171,7 +158,7 @@ public class EnrollmentService : IEnrollmentService
         
         try
         {
-            bool isDeleted = await _repository.DeleteAsync(id);
+            bool isDeleted = await _uow.Enrollments.DeleteAsync(id);
             return !isDeleted ? Result.Failure("Enrollment not found", ErrorType.NotFound) : Result.Success;
         }
         catch (Exception ex)
