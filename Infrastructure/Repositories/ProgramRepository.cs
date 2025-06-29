@@ -29,4 +29,9 @@ public class ProgramRepository(AppDbContext context) : GenericRepository<Program
     {
         return await _context.Programs.AsNoTracking().FirstOrDefaultAsync(x => x.Code == code);
     }
+
+    public async Task<bool> DoesExistsAsync(int id)
+    {
+        return await _context.Programs.AnyAsync(x => x.Id == id);
+    }
 }

@@ -8,4 +8,5 @@ public interface IServiceApplicationRepository : IGenericRepository<ServiceAppli
 {
     Task<bool> DoesPersonHaveActiveApplicationsAsync(int personId, int serviceOfferId);
     Task<ServiceApplication?> GetByPersonIdAsync(int personId);
+    Task<bool> DoesExistsAsync(int id);
 }

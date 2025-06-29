@@ -44,4 +44,9 @@ public class ServiceApplicationRepository(AppDbContext context) : GenericReposit
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.PersonId == personId);
     }
+
+    public async Task<bool> DoesExistsAsync(int id)
+    {
+        return await _context.ServiceApplications.AnyAsync(x => x.Id == id);
+    }
 }
