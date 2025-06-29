@@ -1,5 +1,6 @@
 using Applications.Interfaces.Repositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Infrastructure.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
@@ -29,5 +30,15 @@ public class EnrollmentRepository(AppDbContext context) : GenericRepository<Enro
             .AsNoTracking()
             .Include(x => x.Program)
             .FirstOrDefaultAsync(x => x.StudentId == studentId);
+    }
+
+    public async Task<bool> CanEnrollInProgramAsync(int studentId, int programId)
+    {
+        return !await _context.Enrollments
+            .AnyAsync(x => x.StudentId == studentId && 
+                           x.ProgramId == programId &&
+                           (x.Status == EnrollmentStatus.Active || 
+                            x.Status == EnrollmentStatus.OnLeave ||
+                            x.Status == EnrollmentStatus.Graduated));
     }
 }
