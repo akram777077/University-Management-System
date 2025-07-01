@@ -7,4 +7,5 @@ public interface ICourseRepository : IGenericRepository<Course>
 {
     Task<Course?> GetByCodeAsync(string code);
     Task<bool> DoesCodeExistAsync(string code);
+    Task<bool> DoesExistsAsync(int requestCourseId);
 }
