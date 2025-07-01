@@ -31,7 +31,7 @@ namespace Applications
             services.AddScoped<IPrerequisiteService, PrerequisiteService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
-            
+            services.AddScoped<IGradeService, GradeService>();
             
             return services;
         }
