@@ -20,6 +20,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     private IServiceOfferRepository? _serviceOffers;
     private IStudentRepository? _students;
     private IUserRepository? _users;
+    private ISemesterRepository? _semesters;
+    private ICourseRepository? _courses;
+    private IPrerequisiteRepository? _prerequisites;
 
     // Properties with lazy initialization - all repositories share the same context
     public ICountryRepository Countries => _countries ??= new CountryRepository(context);
@@ -34,6 +37,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IServiceOfferRepository ServiceOffers => _serviceOffers ??= new ServiceOfferRepository(context);
     public IStudentRepository Students => _students ??= new StudentRepository(context);
     public IUserRepository Users => _users ??= new UserRepository(context);
+    public ISemesterRepository Semesters => _semesters ??= new SemesterRepository(context);
+    public ICourseRepository Courses => _courses ??= new CourseRepository(context);
+    public IPrerequisiteRepository Prerequisites => _prerequisites ??= new PrerequisiteRepository(context);
 
     public async Task<int> CompleteAsync() => await context.SaveChangesAsync();
 
