@@ -33,6 +33,7 @@ namespace Infrastructure
             services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             services.AddScoped<ISemesterRepository, SemesterRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IPrerequisiteRepository, PrerequisiteRepository>();
             
             //Unit of work pattern
             services.AddScoped<IUnitOfWork, UnitOfWork>();
