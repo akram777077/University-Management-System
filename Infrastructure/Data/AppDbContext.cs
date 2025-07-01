@@ -22,6 +22,7 @@ namespace Infrastructure.Data
         public DbSet<Prerequisite> Prerequisites { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<Registration> Registrations { get; set; }
+        public DbSet<Grade> Grades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
