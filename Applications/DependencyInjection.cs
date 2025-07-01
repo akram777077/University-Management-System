@@ -32,6 +32,7 @@ namespace Applications
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IGradeService, GradeService>();
+            services.AddScoped<IFinancialHoldService, FinancialHoldService>();
             
             return services;
         }
