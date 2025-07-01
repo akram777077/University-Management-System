@@ -1,4 +1,5 @@
 using Applications.DTOs.Enrollment;
+using Applications.DTOs.Prerequisite;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
@@ -7,7 +8,7 @@ using static Applications.Shared.Result;
 
 namespace Applications.Helpers;
 
-public static class EnrollmentValidator
+public static class RelationshipValidator
 {
     public static async Task<Result> ValidateForEnrollmentAsync(this EnrollmentRequest request, IUnitOfWork uow)
     {
@@ -52,6 +53,26 @@ public static class EnrollmentValidator
         if (serviceApplication.Status != ApplicationStatus.Completed)
             return Failure("Service application must be completed before enrollment", ErrorType.BadRequest);
         
+        return Success;
+    }
+    
+    public static async Task<Result> ValidateForCourseAsync(this PrerequisiteRequest request, IUnitOfWork uow)
+    {
+        if (request.CourseId == request.PrerequisiteCourseId)
+            return Failure("Course cannot be prerequisite of itself", ErrorType.BadRequest);
+
+        if (request.MinimumGrade is < 0 or > 100)
+            return Failure("Minimum grade must be between 0 and 100", ErrorType.BadRequest);
+
+        if (!await uow.Courses.DoesExistsAsync(request.CourseId.Value))
+            return Failure("Specified course does not exist", ErrorType.NotFound);
+        
+        if (!await uow.Courses.DoesExistsAsync(request.PrerequisiteCourseId.Value))
+            return Failure("Specified prerequisite course does not exist", ErrorType.NotFound);
+
+        if (await uow.Prerequisites.DoesExistsAsync(request.CourseId.Value, request.PrerequisiteCourseId.Value))
+            return Failure("Prerequisite already exists", ErrorType.Conflict);
+
         return Success;
     }
 }

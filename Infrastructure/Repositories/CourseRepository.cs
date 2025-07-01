@@ -20,4 +20,9 @@ public class CourseRepository(AppDbContext context) : GenericRepository<Course>(
     {
         return _context.Courses.AnyAsync(c => c.Code == code);
     }
+
+    public async Task<bool> DoesExistsAsync(int id)
+    {
+        return await _context.Courses.AnyAsync(x => x.Id == id);
+    }
 }

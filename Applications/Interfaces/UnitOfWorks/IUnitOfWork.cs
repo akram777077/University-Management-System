@@ -16,6 +16,9 @@ public interface IUnitOfWork : IDisposable, IAsyncDisposable
     IServiceOfferRepository ServiceOffers { get; }
     IStudentRepository Students { get; }
     IUserRepository Users { get; }
+    ISemesterRepository Semesters { get; }
+    ICourseRepository Courses { get; }
+    IPrerequisiteRepository Prerequisites { get; }
 
     Task<int> CompleteAsync();
 }
