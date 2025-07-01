@@ -21,6 +21,7 @@ namespace Infrastructure.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Prerequisite> Prerequisites { get; set; }
         public DbSet<Section> Sections { get; set; }
+        public DbSet<Registration> Registrations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

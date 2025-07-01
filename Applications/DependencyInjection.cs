@@ -30,6 +30,7 @@ namespace Applications
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IPrerequisiteService, PrerequisiteService>();
             services.AddScoped<ISectionService, SectionService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
             
             
             return services;
