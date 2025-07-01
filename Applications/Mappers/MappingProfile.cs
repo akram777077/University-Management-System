@@ -21,6 +21,7 @@ namespace Applications.Mappers
             ApplySemesterMapping();
             ApplyCourseMapping();
             ApplyPrerequisiteMapping();
+            ApplySectionMapping();
         }
 
         //Method signatures
@@ -39,5 +40,6 @@ namespace Applications.Mappers
         partial void ApplySemesterMapping();
         partial void ApplyCourseMapping();
         partial void ApplyPrerequisiteMapping();
+        partial void ApplySectionMapping();
     }
 }
