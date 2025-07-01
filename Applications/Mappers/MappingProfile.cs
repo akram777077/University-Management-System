@@ -23,6 +23,7 @@ namespace Applications.Mappers
             ApplyPrerequisiteMapping();
             ApplySectionMapping();
             ApplyRegistrationMapping();
+            ApplyGradeMapping();
         }
 
         //Method signatures
@@ -43,5 +44,6 @@ namespace Applications.Mappers
         partial void ApplyPrerequisiteMapping();
         partial void ApplySectionMapping();
         partial void ApplyRegistrationMapping();
+        partial void ApplyGradeMapping();
     }
 }
