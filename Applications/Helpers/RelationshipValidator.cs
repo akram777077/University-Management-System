@@ -1,4 +1,5 @@
 using Applications.DTOs.Enrollment;
+using Applications.DTOs.FinancialHold;
 using Applications.DTOs.Prerequisite;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.UnitOfWorks;
@@ -74,5 +75,25 @@ public static class RelationshipValidator
             return Failure("Prerequisite already exists", ErrorType.Conflict);
 
         return Success;
+    }
+    
+    public static async Task<Result> ValidateFinancialHoldRequestAsync(this FinancialHoldRequest request, IUnitOfWork uow)
+    {
+        if (request == default)
+            return Result.Failure("Request cannot be null", ErrorType.BadRequest);
+
+        if (string.IsNullOrWhiteSpace(request.Reason))
+            return Result.Failure("Reason is required", ErrorType.BadRequest);
+
+        if (request.HoldAmount is null or <= 0)
+            return Result.Failure("Valid hold amount is required", ErrorType.BadRequest);
+
+        if (!request.StudentId.HasValue || !await uow.Students.DoesExistsAsync(request.StudentId.Value))
+            return Result.Failure("Valid student ID is required", ErrorType.BadRequest);
+
+        if (!request.PlacedByUserId.HasValue || !await uow.Users.DoesExistAsync(request.PlacedByUserId.Value))
+            return Result.Failure("Valid user ID is required", ErrorType.BadRequest);
+
+        return Result.Success;
     }
 }
