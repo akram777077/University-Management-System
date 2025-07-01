@@ -24,6 +24,7 @@ namespace Applications.Mappers
             ApplySectionMapping();
             ApplyRegistrationMapping();
             ApplyGradeMapping();
+            ApplyFinancialHoldMapping();
         }
 
         //Method signatures
@@ -45,5 +46,6 @@ namespace Applications.Mappers
         partial void ApplySectionMapping();
         partial void ApplyRegistrationMapping();
         partial void ApplyGradeMapping();
+        partial void ApplyFinancialHoldMapping();
     }
 }
