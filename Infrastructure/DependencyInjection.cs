@@ -34,6 +34,7 @@ namespace Infrastructure
             services.AddScoped<ISemesterRepository, SemesterRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<IPrerequisiteRepository, PrerequisiteRepository>();
+            services.AddScoped<ISectionRepository, SectionRepository>();
             
             //Unit of work pattern
             services.AddScoped<IUnitOfWork, UnitOfWork>();
