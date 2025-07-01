@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<Student> Students { get; set; }
         public DbSet<Person> People { get; set; }
@@ -19,8 +19,7 @@ namespace Infrastructure.Data
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Semester> Semesters { get; set; }
         public DbSet<Course> Courses { get; set; }
-        
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public DbSet<Prerequisite> Prerequisites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
