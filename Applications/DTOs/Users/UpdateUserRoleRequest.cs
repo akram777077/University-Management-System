@@ -4,5 +4,5 @@ namespace Applications.DTOs.Users;
 
 public record struct UpdateUserRoleRequest
 {
-    public UserRole Role { get; set; }
+    public UserRole? Role { get; set; }
 }
