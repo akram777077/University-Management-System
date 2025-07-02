@@ -1,7 +1,6 @@
 using Applications.DTOs.Enrollment;
 using Applications.DTOs.FinancialHold;
 using Applications.DTOs.Prerequisite;
-using Applications.Interfaces.Repositories;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
 using Domain.Enums;

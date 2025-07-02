@@ -74,9 +74,7 @@ public class ProgramService : IProgramService
         {
             var program = await _repository.GetByCodeAsync(code);
             if (program == null)
-            {
                 return Result<ProgramResponse>.Failure("Program not found with the specified code", ErrorType.NotFound);
-            }
 
             var response = _mapper.Map<ProgramResponse>(program);
             return Result<ProgramResponse>.Success(response);
@@ -89,19 +87,19 @@ public class ProgramService : IProgramService
         }
     }
 
-    public async Task<Result<ProgramResponse>> AddAsync(ProgramRequest? request)
+    public async Task<Result<ProgramResponse>> AddAsync(ProgramRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<ProgramResponse>.Failure("Program information is required", ErrorType.BadRequest);
-
-        var isExist = await _repository.DoesExistAsync(request.Value.Code ?? string.Empty);
-        if (isExist)
-            return Result<ProgramResponse>.Failure("Program with this code already exists", ErrorType.Conflict);
-
-        var program = _mapper.Map<Program>(request);
-
+        
         try
         {
+            var isExist = await _repository.DoesExistAsync(request.Code ?? string.Empty);
+            if (isExist)
+                return Result<ProgramResponse>.Failure("Program with this code already exists", ErrorType.Conflict);
+
+            var program = _mapper.Map<Program>(request);
+            
             int id = await _repository.AddAsync(program);
             if (id <= 0)
                 return Result<ProgramResponse>.Failure("Failed to create new program record", ErrorType.BadRequest);
@@ -117,20 +115,20 @@ public class ProgramService : IProgramService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, ProgramRequest? request)
+    public async Task<Result> UpdateAsync(int id, ProgramRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Program information is required for update", ErrorType.BadRequest);
-
-        var program = await _repository.GetByIdAsync(id);
-        if (program == null)
-            return Result.Failure("Program Not Found", ErrorType.NotFound);
-
-        _mapper.Map(request.Value, program);
-        program.Id = id;
-
+        
         try
         {
+            var program = await _repository.GetByIdAsync(id);
+            if (program == null)
+                return Result.Failure("Program Not Found", ErrorType.NotFound);
+
+            _mapper.Map(request, program);
+            program.Id = id;
+            
             bool isUpdated = await _repository.UpdateAsync(program);
             return !isUpdated ? Result.Failure($"Failed to update program", ErrorType.BadRequest) : Result.Success;
         }

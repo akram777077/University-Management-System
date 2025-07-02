@@ -29,7 +29,7 @@ namespace Applications.Services
             {
                 //Refactor later to use AutoMapper Projection when the database grows
                 var users = await _repository.GetListAsync();
-                if (users == null || !users.Any())
+                if (!users.Any())
                 {
                     return Result<IReadOnlyCollection<UserResponse>>.Failure(
                         "No users found in the system", ErrorType.NotFound);
@@ -55,12 +55,10 @@ namespace Applications.Services
             try
             {
                 var user = await _repository.GetByIdAsync(id);
-
                 if (user == null)
                     return Result<UserResponse>.Failure("User not found with the specified ID", ErrorType.NotFound);
 
                 var response = _mapper.Map<UserResponse>(user);
-
                 return Result<UserResponse>.Success(response);
             }
             catch (Exception ex)
@@ -79,12 +77,8 @@ namespace Applications.Services
             try
             {
                 var student = await _repository.GetByUsernameAsync(username);
-
                 if (student == null)
-                {
-                    return Result<UserResponse>.Failure(
-                        "User not found with the specified username", ErrorType.NotFound);
-                }
+                    return Result<UserResponse>.Failure("User not found with the specified username", ErrorType.NotFound);
 
                 var response = _mapper.Map<UserResponse>(student);
                 return Result<UserResponse>.Success(response);
@@ -97,20 +91,20 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result<UserResponse>> AddAsync(CreateUserRequest? request)
+        public async Task<Result<UserResponse>> AddAsync(CreateUserRequest request)
         {
-            if (request == null)
+            if (request == default)
                 return Result<UserResponse>.Failure("User information is required", ErrorType.BadRequest);
-
-            var isExist = await _repository.DoesExistAsync(request.Value.PersonId);
-            if (isExist)
-                return Result<UserResponse>.Failure("User already exists", ErrorType.Conflict);
-
-            var user = _mapper.Map<User>(request);
-            user.Password = user.SetPassword(request.Value.Password);
-
+            
             try
             {
+                var isExist = await _repository.DoesExistAsync(request.PersonId);
+                if (isExist)
+                    return Result<UserResponse>.Failure("User already exists", ErrorType.Conflict);
+
+                var user = _mapper.Map<User>(request);
+                user.Password = user.SetPassword(request.Password);
+                
                 int id = await _repository.AddAsync(user);
                 if (id <= 0)
                     return Result<UserResponse>.Failure("Failed to create new user record", ErrorType.BadRequest);
@@ -134,11 +128,7 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(id);
-
-                if (!isDeleted)
-                    return Result.Failure("User not found", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("User not found", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -155,11 +145,7 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(username);
-
-                if (!isDeleted)
-                    return Result.Failure("Username not found", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("Username not found", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -168,25 +154,21 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> UpdateAsync(int id, UpdateUserRequest? request)
+        public async Task<Result> UpdateAsync(int id, UpdateUserRequest request)
         {
-            if (request == null)
+            if (request == default)
                 return Result.Failure("User information is required for update", ErrorType.BadRequest);
-
-            var user = await _repository.GetByIdAsync(id);
-            if (user == null)
-                return Result.Failure("User not found", ErrorType.NotFound);
-
-            _mapper.Map(request.Value, user);
-
+            
             try
             {
+                var user = await _repository.GetByIdAsync(id);
+                if (user == null)
+                    return Result.Failure("User not found", ErrorType.NotFound);
+
+                _mapper.Map(request, user);
+                
                 bool isUpdated = await _repository.UpdateAsync(user);
-
-                if (!isUpdated)
-                    return Result.Failure($"Failed to update user", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update user", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -195,35 +177,29 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> ChangePasswordAsync(int id, ChangePasswordRequest? request)
+        public async Task<Result> ChangePasswordAsync(int id, ChangePasswordRequest request)
         {
             if (id <= 0)
                 return Result.Failure("Invalid user ID provided", ErrorType.BadRequest);
 
-            if (request == null)
+            if (request == default)
                 return Result.Failure("Password information is required for update", ErrorType.BadRequest);
-
-            var user = await _repository.GetByIdAsync(id);
-
-            if (user == null)
-                return Result<UserResponse>.Failure("User not found with the specified ID", ErrorType.NotFound);
-
-            bool isCorrectPassword = user.VerifyPassword(request.Value.CurrentPassword, user.Password);
-
-            if(!isCorrectPassword)
-                return Result.Failure("Incorrect current password", ErrorType.BadRequest);
-
-            user.Password = user.SetPassword(request.Value.NewPassword);
-            user.LastLoginAt = DateTime.UtcNow;
-
+            
             try
             {
+                var user = await _repository.GetByIdAsync(id);
+                if (user == null)
+                    return Result<UserResponse>.Failure("User not found with the specified ID", ErrorType.NotFound);
+
+                bool isCorrectPassword = user.VerifyPassword(request.CurrentPassword, user.Password);
+                if(!isCorrectPassword)
+                    return Result.Failure("Incorrect current password", ErrorType.BadRequest);
+
+                user.Password = user.SetPassword(request.NewPassword);
+                user.LastLoginAt = DateTime.UtcNow;
+                
                 bool isUpdated = await _repository.UpdateAsync(user);
-
-                if (!isUpdated)
-                    return Result.Failure($"Failed to update user password", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update user password", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -232,29 +208,23 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> UpdateUserRoleAsync(int id, UpdateUserRoleRequest? roleStatus)
+        public async Task<Result> UpdateUserRoleAsync(int id, UpdateUserRoleRequest roleStatus)
         {
             if (id <= 0)
                 return Result.Failure("Invalid user ID provided", ErrorType.BadRequest);
 
-            if (roleStatus == null)
+            if (!roleStatus.Role.HasValue)
                 return Result.Failure("No role Value Provided", ErrorType.BadRequest);
 
             try
             {
                 var user = await _repository.GetByIdAsync(id);
-
                 if (user == null)
                     return Result.Failure($"User not found", ErrorType.NotFound);
 
-                user.Role = roleStatus.Value.Role;
-
+                user.Role = roleStatus.Role.Value;
                 var isUpdated = await _repository.UpdateAsync(user);
-
-                if (!isUpdated)
-                    return Result.Failure($"Failed to update user role", ErrorType.BadRequest);
-
-                return Result.Success;
+                return !isUpdated ? Result.Failure($"Failed to update user role", ErrorType.BadRequest) : Result.Success;
             }
             catch (Exception ex)
             {

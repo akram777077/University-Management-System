@@ -89,17 +89,18 @@ public class ServiceApplicationService : IServiceApplicationService
         }
     }
 
-    public async Task<Result<ServiceApplicationResponse>> AddAsync(ServiceApplicationCreateRequest? request)
+    public async Task<Result<ServiceApplicationResponse>> AddAsync(ServiceApplicationCreateRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<ServiceApplicationResponse>.Failure("Application data is required", ErrorType.BadRequest);
-        
-        if(await request.ValidateNewApplication(_repository))
-           return Result<ServiceApplicationResponse>.Failure(
-               "Person already has an active/incomplete application for this service type", ErrorType.Conflict);
         
         try
         {
+            var result = await _repository.DoesPersonHaveActiveApplicationsAsync(request.PersonId, request.ServiceOfferId);
+            if(result)
+                return Result<ServiceApplicationResponse>.Failure(
+                    "Person already has an active/incomplete application for this service type", ErrorType.Conflict);
+            
             var application = _mapper.Map<ServiceApplication>(request);
             application.ApplicationDate = DateTime.UtcNow;
             application.Status = ApplicationStatus.New;
@@ -119,9 +120,9 @@ public class ServiceApplicationService : IServiceApplicationService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, ServiceApplicationUpdateRequest? request)
+    public async Task<Result> UpdateAsync(int id, ServiceApplicationUpdateRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Application data is required", ErrorType.BadRequest);
 
         try
@@ -130,7 +131,7 @@ public class ServiceApplicationService : IServiceApplicationService
             if (existingApp == null)
                 return Result.Failure("Application not found", ErrorType.NotFound);
 
-            _mapper.Map(request.Value, existingApp);
+            _mapper.Map(request, existingApp);
             bool isUpdated = await _repository.UpdateAsync(existingApp);
             return !isUpdated ? Result.Failure("Failed to update application", ErrorType.BadRequest) : Result.Success;
         }
@@ -141,9 +142,9 @@ public class ServiceApplicationService : IServiceApplicationService
         }
     }
 
-    public async Task<Result> UpdateStatusAsync(int id, ServiceApplicationUpdateStatusRequest? request)
+    public async Task<Result> UpdateStatusAsync(int id, ServiceApplicationUpdateStatusRequest request)
     {
-        if(request == null)
+        if(request == default || !request.Status.HasValue)
             return Result.Failure("Status information is required", ErrorType.BadRequest);
         try
         {
@@ -151,7 +152,7 @@ public class ServiceApplicationService : IServiceApplicationService
             if (application == null)
                 return Result.Failure("Application not found", ErrorType.NotFound);
 
-            application.Status = request.Value.Status;
+            application.Status = request.Status.Value;
             bool isUpdated = await _repository.UpdateAsync(application);
             return !isUpdated ? Result.Failure("Failed to update status", ErrorType.BadRequest) : Result.Success;
         }

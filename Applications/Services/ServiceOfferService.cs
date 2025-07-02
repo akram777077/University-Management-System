@@ -65,18 +65,19 @@ public class ServiceOfferService : IServiceOfferService
         }
     }
 
-    public async Task<Result<ServiceOfferResponse>> AddAsync(ServiceOfferRequest? request)
+    public async Task<Result<ServiceOfferResponse>> AddAsync(ServiceOfferRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<ServiceOfferResponse>.Failure("Service offer information is required", ErrorType.BadRequest);
-
-        var isExist = await _repository.DoesExistAsync(request.Value.Name ?? string.Empty);
-        if (isExist)
-            return Result<ServiceOfferResponse>.Failure("Service offer already exists", ErrorType.Conflict);
-
-        var offer = _mapper.Map<ServiceOffer>(request);
+        
         try
         {
+            var isExist = await _repository.DoesExistAsync(request.Name ?? string.Empty);
+            if (isExist)
+                return Result<ServiceOfferResponse>.Failure("Service offer already exists", ErrorType.Conflict);
+
+            var offer = _mapper.Map<ServiceOffer>(request);
+            
             int id = await _repository.AddAsync(offer);
             if (id <= 0)
                 return Result<ServiceOfferResponse>.Failure("Failed to create new service offer", ErrorType.BadRequest);
@@ -91,18 +92,19 @@ public class ServiceOfferService : IServiceOfferService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, ServiceOfferRequest? request)
+    public async Task<Result> UpdateAsync(int id, ServiceOfferRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Service offer information is required for update", ErrorType.BadRequest);
-
-        var service = await _repository.GetByIdAsync(id);
-        if (service == null)
-            return Result.Failure("Service offer not found", ErrorType.NotFound);
-
-        _mapper.Map(request.Value, service);
+        
         try
         {
+            var service = await _repository.GetByIdAsync(id);
+            if (service == null)
+                return Result.Failure("Service offer not found", ErrorType.NotFound);
+
+            _mapper.Map(request, service);
+            
             bool isUpdated = await _repository.UpdateAsync(service);
             return !isUpdated ? Result.Failure("Failed to update service offer", ErrorType.BadRequest) : Result.Success;
         }

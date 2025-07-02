@@ -62,9 +62,9 @@ public class InterviewService : IInterviewService
         }
     }
 
-    public async Task<Result<InterviewResponse>> AddAsync(InterviewRequest? request)
+    public async Task<Result<InterviewResponse>> AddAsync(InterviewRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<InterviewResponse>.Failure("Interview information is required", ErrorType.BadRequest);
         
         try
@@ -89,9 +89,9 @@ public class InterviewService : IInterviewService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, InterviewRequest? request)
+    public async Task<Result> UpdateAsync(int id, InterviewRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Interview information is required for update", ErrorType.BadRequest);
 
         try
@@ -128,15 +128,15 @@ public class InterviewService : IInterviewService
         }
     }
 
-    public async Task<Result> CompleteInterviewAsync(int id, CompleteInterviewRequest? request)
+    public async Task<Result> CompleteInterviewAsync(int id, CompleteInterviewRequest request)
     {
         if (id <= 0)
             return Result.Failure("Invalid interview ID provided", ErrorType.BadRequest);
         
-        if (request == null)
+        if (request == default)
             return Result.Failure("Interview information is required", ErrorType.BadRequest);
         
-        if (string.IsNullOrWhiteSpace(request.Value.Recommendation))
+        if (string.IsNullOrWhiteSpace(request.Recommendation))
             return Result.Failure("Recommendation is required", ErrorType.BadRequest);
 
         try
@@ -145,9 +145,9 @@ public class InterviewService : IInterviewService
             if (interview == null)
                 return Result.Failure("Interview not found", ErrorType.NotFound);
 
-            interview.EndTime = request.Value.EndTime;
-            interview.IsApproved = request.Value.IsApproved;
-            interview.Recommendation = request.Value.Recommendation;
+            interview.EndTime = request.EndTime;
+            interview.IsApproved = request.IsApproved;
+            interview.Recommendation = request.Recommendation;
             
             bool isUpdated = await _repository.UpdateAsync(interview);
             return !isUpdated ? Result.Failure("Failed to complete interview", ErrorType.BadRequest) : Result.Success;

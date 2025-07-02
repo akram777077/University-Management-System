@@ -93,20 +93,20 @@ public class ProfessorService : IProfessorService
         }
     }
 
-    public async Task<Result<ProfessorResponse>> AddAsync(ProfessorRequest? request)
+    public async Task<Result<ProfessorResponse>> AddAsync(ProfessorRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<ProfessorResponse>.Failure("Professor information is required", ErrorType.BadRequest);
-
-        var isExist = await _repository.DoesExistAsync(request.Value.PersonId);
-        if (isExist)
-            return Result<ProfessorResponse>.Failure("Professor already exists", ErrorType.Conflict);
-
-        var professor = _mapper.Map<Professor>(request);
-        professor.EmployeeNumber = professor.GenerateUniqueNumber();
-
+        
         try
         {
+            var isExist = await _repository.DoesExistAsync(request.PersonId);
+            if (isExist)
+                return Result<ProfessorResponse>.Failure("Professor already exists", ErrorType.Conflict);
+
+            var professor = _mapper.Map<Professor>(request);
+            professor.EmployeeNumber = professor.GenerateUniqueNumber();
+            
             int id = await _repository.AddAsync(professor);
             if (id <= 0)
                 return Result<ProfessorResponse>.Failure("Failed to create new professor record", ErrorType.BadRequest);
@@ -122,20 +122,20 @@ public class ProfessorService : IProfessorService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, ProfessorRequest? request)
+    public async Task<Result> UpdateAsync(int id, ProfessorRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Professor information is required for update", ErrorType.BadRequest);
-
-        var professor = await _repository.GetByIdAsync(id);
-        if (professor == null)
-            return Result.Failure("Professor Not Found", ErrorType.NotFound);
-
-        _mapper.Map(request.Value, professor);
-        professor.Id = id;
-
+        
         try
         {
+            var professor = await _repository.GetByIdAsync(id);
+            if (professor == null)
+                return Result.Failure("Professor Not Found", ErrorType.NotFound);
+
+            _mapper.Map(request, professor);
+            professor.Id = id;
+            
             bool isUpdated = await _repository.UpdateAsync(professor);
             return !isUpdated ? Result.Failure($"Failed to update professor", ErrorType.BadRequest) : Result.Success;
         }
