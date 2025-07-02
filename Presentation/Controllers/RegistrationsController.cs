@@ -15,8 +15,8 @@ public class RegistrationsController(IRegistrationService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<RegistrationResponse>>> GetList()
     {
-        var result = await service.GetListAsync();
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetListAsync();
+        return response.HandleResult();
     }
 
     [HttpGet("{id}")]
@@ -26,8 +26,8 @@ public class RegistrationsController(IRegistrationService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RegistrationResponse>> GetById(int id)
     {
-        var result = await service.GetByIdAsync(id);
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetByIdAsync(id);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -37,32 +37,29 @@ public class RegistrationsController(IRegistrationService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RegistrationResponse>> Create(RegistrationRequest request)
     {
-        var result = await service.AddAsync(request);
-        if (!result.IsSuccess)
-            return result.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        var response = await service.AddAsync(request);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Update(int id, RegistrationRequest request)
     {
-        var result = await service.UpdateAsync(id, request);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.UpdateAsync(id, request);
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(int id)
     {
-        var result = await service.DeleteAsync(id);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.DeleteAsync(id);
+        return response.HandleResult();
     }
 }

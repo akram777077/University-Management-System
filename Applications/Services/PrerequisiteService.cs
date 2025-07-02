@@ -1,6 +1,5 @@
 using Applications.DTOs.Prerequisite;
 using Applications.Helpers;
-using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
@@ -66,12 +65,15 @@ public class PrerequisiteService : IPrerequisiteService
     }
     public async Task<Result<PrerequisiteResponse>> AddAsync(PrerequisiteRequest request)
     {
-        var result = await request.ValidateForCourseAsync(_uow);
-        if (!result.IsSuccess)
-            return Result<PrerequisiteResponse>.Failure(result.Error, result.ErrorType);
-
+        if (request == default)
+            return Result<PrerequisiteResponse>.Failure("Prerequisite data is required", ErrorType.BadRequest);
+        
         try
         {
+            var result = await request.ValidateForCourseAsync(_uow);
+            if (!result.IsSuccess)
+                return Result<PrerequisiteResponse>.Failure(result.Error, result.ErrorType);
+            
             var prerequisite = _mapper.Map<Prerequisite>(request);
             int id = await _uow.Prerequisites.AddAsync(prerequisite);
             
@@ -92,6 +94,8 @@ public class PrerequisiteService : IPrerequisiteService
         if (id <= 0)
             return Failure("Invalid prerequisite ID", ErrorType.BadRequest);
 
+        if (request == default)
+            return Result.Failure("Prerequisite data is required", ErrorType.BadRequest);
         try
         {
             var result = await request.ValidateForCourseAsync(_uow);

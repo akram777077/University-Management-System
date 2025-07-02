@@ -15,8 +15,8 @@ public class PrerequisitesController(IPrerequisiteService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<PrerequisiteResponse>>> GetByCourseId(int courseId)
     {
-        var result = await service.GetByCourseIdAsync(courseId);
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetByCourseIdAsync(courseId);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -28,14 +28,10 @@ public class PrerequisitesController(IPrerequisiteService service) : ControllerB
     public async Task<ActionResult<PrerequisiteResponse>> Add(int courseId, PrerequisiteRequest request)
     {
         var response = await service.AddAsync(request);
-        
-        if (!response.IsSuccess)
-            response.HandleResult();
-        
-        return CreatedAtAction(nameof(GetByCourseId), new { courseId }, response);
+        return response.HandleResult(nameof(GetByCourseId), new { courseId });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,19 +39,19 @@ public class PrerequisitesController(IPrerequisiteService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Update(int id, PrerequisiteRequest request)
     {
-        var result = await service.UpdateAsync(id, request);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.UpdateAsync(id, request);
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(int id)
     {
-        var result = await service.DeleteAsync(id);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.DeleteAsync(id);
+        return response.HandleResult();
     }
 
     [HttpDelete]
@@ -65,7 +61,7 @@ public class PrerequisitesController(IPrerequisiteService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> DeleteAllForCourse(int courseId)
     {
-        var result = await service.DeleteForCourseAsync(courseId);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.DeleteForCourseAsync(courseId);
+        return response.HandleResult();
     }
 }

@@ -16,10 +16,10 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult<IEnumerable<CourseResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,7 +27,7 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult<CourseResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpGet("by-code/{code}")]
@@ -38,7 +38,7 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult<CourseResponse>> GetByCourseCode(string code)
     {
         var response = await service.GetByCodeAsync(code);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -49,14 +49,10 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult<CourseResponse>> Create(CourseRequest request)
     {
         var response = await service.AddAsync(request);
-
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -64,10 +60,10 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult> Update(int id, CourseRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpPatch("{id}/deactivate")]
+    [HttpPatch("{id:int}/deactivate")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -75,10 +71,10 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult> DeactivateCourse(int id)
     {
         var response = await service.DeactivateCourseAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -86,6 +82,6 @@ public class CoursesController(ICourseService service) : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

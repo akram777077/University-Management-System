@@ -2,50 +2,33 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
 using Applications.Interfaces.Services;
 using Applications.DTOs.Student;
-using Applications.DTOs.Users;
 
 namespace Presentation.Controllers
 {
     [Route("api/students")]
     [ApiController]
-    public class StudentsController : ControllerBase
+    public class StudentsController(IStudentService service) : ControllerBase
     {
-        private readonly IStudentService _service;
-
-        public StudentsController(IStudentService service)
-        {
-            _service = service;
-        }
-
-
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<StudentResponse>>> GetList()
         {
-            var result = await _service.GetListAsync();
-
-            if(!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetListAsync();
+            return response.HandleResult();
         }
 
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<StudentResponse>> GetById(int id)
         {
-            var result = await _service.GetByIdAsync(id);
-
-            if (!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetByIdAsync(id);
+            return response.HandleResult();
         }
 
 
@@ -56,12 +39,8 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<StudentResponse>> GetByStudentNumber(string number)
         {
-            var result = await _service.GetByStudentNumberAsync(number);
-
-            if (!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetByStudentNumberAsync(number);
+            return response.HandleResult();
         }
 
 
@@ -70,30 +49,22 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentResponse>> Create(StudentRequest? request)
+        public async Task<ActionResult<StudentResponse>> Create(StudentRequest request)
         {
-            var response = await _service.AddAsync(request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+            var response = await service.AddAsync(request);
+            return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(int id)
         {
-            var response = await _service.DeleteAsync(id);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.DeleteAsync(id);
+            return response.HandleResult();
         }
 
 
@@ -104,43 +75,31 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(string number)
         {
-            var response = await _service.DeleteAsync(number);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.DeleteAsync(number);
+            return response.HandleResult();
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Update(int id, StudentRequest? request)
+        public async Task<ActionResult> Update(int id, StudentRequest request)
         {
-            var response = await _service.UpdateAsync(id, request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.UpdateAsync(id, request);
+            return response.HandleResult();
         }
 
-        [HttpPatch("{id}/status")]
+        [HttpPatch("{id:int}/status")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Patch(int id, UpdateStudentStatusRequest? status)
+        public async Task<ActionResult> Patch(int id, UpdateStudentStatusRequest status)
         {
-            var response = await _service.UpdateStudentStatusAsync(id, status);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.UpdateStudentStatusAsync(id, status);
+            return response.HandleResult();
         }
     }   
 }

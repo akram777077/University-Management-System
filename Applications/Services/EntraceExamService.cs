@@ -65,15 +65,15 @@ public class EntranceExamService : IEntranceExamService
         }
     }
 
-    public async Task<Result<EntranceExamResponse>> AddAsync(EntranceExamRequest? request)
+    public async Task<Result<EntranceExamResponse>> AddAsync(EntranceExamRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<EntranceExamResponse>.Failure("Entrance exam information is required", ErrorType.BadRequest);
-
-        var exam = _mapper.Map<EntranceExam>(request);
         
         try
         {
+            var exam = _mapper.Map<EntranceExam>(request);
+            
             int id = await _repository.AddAsync(exam);
             if (id <= 0)
                 return Result<EntranceExamResponse>.Failure("Failed to create new entrance exam", ErrorType.BadRequest);
@@ -88,9 +88,9 @@ public class EntranceExamService : IEntranceExamService
         }
     }
 
-    public async Task<Result> UpdateAsync(int id, EntranceExamRequest? request)
+    public async Task<Result> UpdateAsync(int id, EntranceExamRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Entrance exam information is required", ErrorType.BadRequest);
 
         try
@@ -99,7 +99,7 @@ public class EntranceExamService : IEntranceExamService
             if (exam == null)
                 return Result.Failure("Entrance exam not found", ErrorType.NotFound);
 
-            _mapper.Map(request.Value, exam);
+            _mapper.Map(request, exam);
             
             if (exam.Score.HasValue && exam.ExamStatus != ExamStatus.Scored)
             {
@@ -134,18 +134,18 @@ public class EntranceExamService : IEntranceExamService
         }
     }
     
-    public async Task<Result> UpdateScoreCriteriaAsync(int id, UpdateScoreCriteriaRequest? request)
+    public async Task<Result> UpdateScoreCriteriaAsync(int id, UpdateScoreCriteriaRequest request)
     {
         if (id <= 0)
             return Result.Failure("Invalid entrance exam ID provided", ErrorType.BadRequest);
      
-        if(request == null)
+        if(request == default)
             return Result.Failure("Score data is required", ErrorType.BadRequest);
         
-        if (request.Value.MaxScore <= 0)
+        if (request.MaxScore <= 0)
             return Result.Failure("Invalid max score provided", ErrorType.BadRequest);
         
-        if (request.Value.PassingScore <= 0)
+        if (request.PassingScore <= 0)
             return Result.Failure("Invalid passing score provided", ErrorType.BadRequest);
 
         try
@@ -154,28 +154,28 @@ public class EntranceExamService : IEntranceExamService
             if (exam == null)
                 return Result.Failure("Entrance exam not found", ErrorType.NotFound);
 
-            exam.MaxScore = request.Value.MaxScore;
-            exam.PassingScore = request.Value.PassingScore;
+            exam.MaxScore = request.MaxScore;
+            exam.PassingScore = request.PassingScore;
             
             bool isUpdated = await _repository.UpdateAsync(exam);
             return !isUpdated ? Result.Failure("Failed to update entrance exam score", ErrorType.BadRequest) : Result.Success;
         }
         catch (Exception ex)
         {
-            _logger.LogError("Database error updating entrance exam score", ex, new { id, request.Value });
+            _logger.LogError("Database error updating entrance exam score", ex, new { id, request });
             return Result.Failure("Failed to update entrance exam score due to a system error", ErrorType.InternalServerError);
         }
     }
     
-    public async Task<Result> UpdateStudentScoreAsync(int id, UpdateScoreRequest? request)
+    public async Task<Result> UpdateStudentScoreAsync(int id, UpdateScoreRequest request)
     {
         if (id <= 0)
             return Result.Failure("Invalid entrance exam ID provided", ErrorType.BadRequest);
      
-        if(request == null)
+        if(request == default)
             return Result.Failure("Score data is required", ErrorType.BadRequest);
         
-        if (request.Value.Score is < 0 or > 100)
+        if (request.Score is < 0 or > 100)
             return Result.Failure("Score must be between 0 and 100", ErrorType.BadRequest);
 
         try
@@ -184,17 +184,17 @@ public class EntranceExamService : IEntranceExamService
             if (exam == null)
                 return Result.Failure("Entrance exam not found", ErrorType.NotFound);
 
-            exam.Score = request.Value.Score;
+            exam.Score = request.Score;
             exam.ExamStatus = ExamStatus.Scored;
-            exam.IsPassed = request.Value.Score >= exam.PassingScore;
-            exam.Notes = request.Value.Notes;
+            exam.IsPassed = request.Score >= exam.PassingScore;
+            exam.Notes = request.Notes;
             
             bool isUpdated = await _repository.UpdateAsync(exam);
             return !isUpdated ? Result.Failure("Failed to update entrance exam score", ErrorType.BadRequest) : Result.Success;
         }
         catch (Exception ex)
         {
-            _logger.LogError("Database error updating entrance exam score", ex, new { id, request.Value.Score });
+            _logger.LogError("Database error updating entrance exam score", ex, new { id, request.Score });
             return Result.Failure("Failed to update entrance exam score due to a system error", ErrorType.InternalServerError);
         }
     }

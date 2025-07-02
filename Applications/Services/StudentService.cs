@@ -29,7 +29,7 @@ namespace Applications.Services
             {
                 //Refactor later to use AutoMapper Projection when the database grows
                 var students = await _repository.GetListAsync();
-                if (students == null || !students.Any())
+                if (!students.Any())
                 {
                     return Result<IReadOnlyCollection<StudentResponse>>.Failure(
                         "No students found in the system", ErrorType.NotFound);
@@ -47,22 +47,21 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result<StudentResponse>> AddAsync(StudentRequest? request)
+        public async Task<Result<StudentResponse>> AddAsync(StudentRequest request)
         {
-            if (request == null)
+            if (request == default)
                 return Result<StudentResponse>.Failure("Student information is required", ErrorType.BadRequest);
-
-            var isExist = await _repository.DoesExistAsync(request.Value.PersonId);
-            if (!isExist)
-                return Result<StudentResponse>.Failure("Student already exists", ErrorType.Conflict);
-
-            var student = _mapper.Map<Student>(request);
-            student.StudentNumber = student.GenerateUniqueNumber();
-
+            
             try
             {
-                int id = await _repository.AddAsync(student);
+                var isExist = await _repository.DoesExistAsync(request.PersonId);
+                if (!isExist)
+                    return Result<StudentResponse>.Failure("Student already exists", ErrorType.Conflict);
 
+                var student = _mapper.Map<Student>(request);
+                student.StudentNumber = student.GenerateUniqueNumber();
+                
+                int id = await _repository.AddAsync(student);
                 if (id <= 0)
                     return Result<StudentResponse>.Failure("Failed to create new student record", ErrorType.BadRequest);
 
@@ -76,20 +75,20 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> UpdateAsync(int id, StudentRequest? request)
+        public async Task<Result> UpdateAsync(int id, StudentRequest request)
         {
-            if (request == null)
+            if (request == default)
                 return Result.Failure("Student information is required for update", ErrorType.BadRequest);
-
-            var student = await _repository.GetByIdAsync(id);
-            if (student == null)
-                return Result.Failure("Student Not Found", ErrorType.NotFound);
-
-            _mapper.Map(request.Value, student);
-            student.Id = id;
 
             try
             {
+                var student = await _repository.GetByIdAsync(id);
+                if (student == null)
+                    return Result.Failure("Student Not Found", ErrorType.NotFound);
+
+                _mapper.Map(request, student);
+                student.Id = id;
+                
                 bool isUpdated = await _repository.UpdateAsync(student);
                 return !isUpdated ? Result.Failure($"Failed to update student", ErrorType.BadRequest) : Result.Success;
             }
@@ -181,12 +180,12 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> UpdateStudentStatusAsync(int id, UpdateStudentStatusRequest? status)
+        public async Task<Result> UpdateStudentStatusAsync(int id, UpdateStudentStatusRequest status)
         {
             if (id <= 0)
                 return Result.Failure("Invalid student ID provided", ErrorType.BadRequest);
 
-            if(!status.HasValue)
+            if(!status.StudentStatus.HasValue)
                 return Result.Failure("No Status Value Provided", ErrorType.BadRequest);
 
             try
@@ -196,9 +195,8 @@ namespace Applications.Services
                 if (student == null)
                     return Result.Failure($"Student not found", ErrorType.NotFound);
 
-                student.StudentStatus = status.Value.StudentStatus;
-                student.Notes = string.IsNullOrEmpty(status.Value.Notes) 
-                    ? student.Notes : status.Value.Notes;
+                student.StudentStatus = status.StudentStatus.Value;
+                student.Notes = string.IsNullOrEmpty(status.Notes) ? student.Notes : status.Notes;
 
                 var isUpdated = await _repository.UpdateAsync(student);
                 return !isUpdated ? Result.Failure($"Failed to update student status", ErrorType.BadRequest) : Result.Success;

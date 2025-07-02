@@ -1,6 +1,5 @@
 using Applications.DTOs.FinancialHold;
 using Applications.Helpers;
-using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
@@ -15,7 +14,7 @@ public class FinancialHoldService : IFinancialHoldService
 {
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
-    private readonly IMyLogger _logger;
+    private readonly IMyLogger _logger; 
 
     public FinancialHoldService(IUnitOfWork uow, IMapper mapper, IMyLogger logger)
     {
@@ -37,6 +36,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error retrieving all financial holds", ex);
             return Result<IReadOnlyCollection<FinancialHoldResponse>>.Failure(
                 "Failed to retrieve financial holds", ErrorType.InternalServerError);
         }
@@ -58,6 +58,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error retrieving financial hold", ex, new { id });
             return Result<FinancialHoldResponse>.Failure(
                 "Failed to retrieve financial hold", ErrorType.InternalServerError);
         }
@@ -79,6 +80,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error retrieving financial holds by student ID", ex, new { studentId });
             return Result<IReadOnlyCollection<FinancialHoldResponse>>.Failure(
                 "Failed to retrieve student holds", ErrorType.InternalServerError);
         }
@@ -105,8 +107,9 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
-            return Result<FinancialHoldResponse>.Failure(
-                "Failed to create financial hold", ErrorType.InternalServerError);
+            _logger.LogError("Database error adding financial hold", ex, new { request });
+            return Result<FinancialHoldResponse>.Failure("Failed to create financial hold",
+                ErrorType.InternalServerError);
         }
     }
 
@@ -131,6 +134,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error updating financial hold", ex, new { id, request });
             return Result.Failure("Failed to update financial hold", ErrorType.InternalServerError);
         }
     }
@@ -163,6 +167,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error resolving financial hold", ex, new { id, request });
             return Result.Failure("Failed to resolve hold", ErrorType.InternalServerError);
         }
     }
@@ -179,6 +184,7 @@ public class FinancialHoldService : IFinancialHoldService
         }
         catch (Exception ex)
         {
+            _logger.LogError("Database error deleting financial hold", ex, new { id });
             return Result.Failure("Failed to delete financial hold", ErrorType.InternalServerError);
         }
     }

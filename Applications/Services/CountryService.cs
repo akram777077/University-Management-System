@@ -27,7 +27,7 @@ namespace Applications.Services
             try
             {
                 var countries = await _repository.GetListAsync();
-                if (countries == null || !countries.Any())
+                if (!countries.Any())
                 {
                     return Result<IReadOnlyCollection<CountryResponse>>.Failure(
                         "No Countries found in the system", ErrorType.NotFound);

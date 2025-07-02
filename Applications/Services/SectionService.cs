@@ -75,10 +75,8 @@ public class SectionService : ISectionService
         {
             var section = await _repository.GetBySectionNumberAsync(sectionNumber);
             if (section == null)
-            {
                 return Result<SectionResponse>.Failure(
                     "Section not found with the specified section number", ErrorType.NotFound);
-            }
 
             var response = _mapper.Map<SectionResponse>(section);
             return Result<SectionResponse>.Success(response);
@@ -96,14 +94,14 @@ public class SectionService : ISectionService
         if (request == default)
             return Result<SectionResponse>.Failure("Section information is required", ErrorType.BadRequest);
 
-        var isExist = await _repository.DoesExistAsync(request.SectionNumber);
-        if (isExist)
-            return Result<SectionResponse>.Failure("Section with this number already exists", ErrorType.Conflict);
-
-        var section = _mapper.Map<Section>(request);
-
         try
         {
+            var isExist = await _repository.DoesExistAsync(request.SectionNumber ?? string.Empty);
+            if (isExist)
+                return Result<SectionResponse>.Failure("Section with this number already exists", ErrorType.Conflict);
+
+            var section = _mapper.Map<Section>(request);
+            
             int id = await _repository.AddAsync(section);
             if (id <= 0)
                 return Result<SectionResponse>.Failure("Failed to create new section record", ErrorType.BadRequest);

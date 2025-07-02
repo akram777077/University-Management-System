@@ -22,19 +22,18 @@ namespace Applications.Services
             _logger = logger;
         }
         
-        public async Task<Result<PersonResponse>> AddAsync(PersonRequest? request)
+        public async Task<Result<PersonResponse>> AddAsync(PersonRequest request)
         {
-            if (request == null)
+            if (request == default)
                 return Result<PersonResponse>.Failure("Student information is required", ErrorType.BadRequest);
-            
-            bool isExists = await _repository.DoesExistAsync(request.Value.LastName);
-            if(!isExists)
-                return Result<PersonResponse>.Failure("Person already exists", ErrorType.Conflict);
-            
-            var person = _mapper.Map<Person>(request);
             
             try
             {
+                bool isExists = await _repository.DoesExistAsync(request.LastName ?? string.Empty);
+                if(isExists)
+                    return Result<PersonResponse>.Failure("Person already exists", ErrorType.Conflict);
+            
+                var person = _mapper.Map<Person>(request);
                 await _repository.AddAsync(person);
             
                 if (person.Id <= 0)
@@ -56,14 +55,13 @@ namespace Applications.Services
             {
                 //Refactor later to use AutoMapper Projection when the database grows
                 var people = await _repository.GetListAsync();
-                if (people == null || !people.Any())
+                if (!people.Any())
                 {
                     return Result<IReadOnlyCollection<PersonResponse>>.Failure(
                         "No people records found in the system", ErrorType.NotFound);
                 }
 
                 var response = _mapper.Map<IReadOnlyCollection<PersonResponse>>(people);
-
                 return Result<IReadOnlyCollection<PersonResponse>>.Success(response);
             }
             catch (Exception ex)
@@ -83,12 +81,10 @@ namespace Applications.Services
             try
             {
                 var person = await _repository.GetByIdAsync(id);
-
                 if (person == null)
                     return Result<PersonResponse>.Failure("Person not found with the specified ID", ErrorType.NotFound);
 
                 var response = _mapper.Map<PersonResponse>(person);
-
                 return Result<PersonResponse>.Success(response);
             }
             catch (Exception ex)
@@ -125,20 +121,23 @@ namespace Applications.Services
             }
         }
 
-        public async Task<Result> UpdateAsync(int id, PersonRequest? request)
+        public async Task<Result> UpdateAsync(int id, PersonRequest request)
         {
-            if (id <= 0 || request == null)
+            if (id <= 0)
+                return Result.Failure("Invalid person ID provided", ErrorType.BadRequest);
+            
+            if (request == default)
                 return Result.Failure("Person information is required for update", ErrorType.BadRequest);
-
-            var person = await _repository.GetByIdAsync(id);
-            if (person == null)
-                return Result.Failure("Person Already Exists", ErrorType.Conflict);
-
-            _mapper.Map(request.Value, person);
-            person.Id = id;
-
+            
             try
             {
+                var person = await _repository.GetByIdAsync(id);
+                if (person == null)
+                    return Result.Failure("Person Already Exists", ErrorType.Conflict);
+
+                _mapper.Map(request, person);
+                person.Id = id;
+                
                 bool isUpdated = await _repository.UpdateAsync(person);
                 return !isUpdated ? Result.Failure($"Failed to update person", ErrorType.BadRequest) : Result.Success;
             }
@@ -157,11 +156,7 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(id);
-
-                if (!isDeleted)
-                    return Result.Failure("Person not found", ErrorType.NotFound);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("Person not found", ErrorType.NotFound) : Result.Success;
             }
             catch (Exception ex)
             {
@@ -179,11 +174,7 @@ namespace Applications.Services
             try
             {
                 bool isDeleted = await _repository.DeleteAsync(lastName);
-
-                if (!isDeleted)
-                    return Result.Failure("Person not found", ErrorType.NotFound);
-
-                return Result.Success;
+                return !isDeleted ? Result.Failure("Person not found", ErrorType.NotFound) : Result.Success;
             }
             catch (Exception ex)
             {
