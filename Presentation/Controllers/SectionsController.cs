@@ -16,10 +16,10 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult<IEnumerable<SectionResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,7 +27,7 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult<SectionResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpGet("by-number/{sectionNumber}")]
@@ -38,7 +38,7 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult<SectionResponse>> GetBySectionNumber(string sectionNumber)
     {
         var response = await service.GetBySectionNumberAsync(sectionNumber);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -48,15 +48,11 @@ public class SectionsController(ISectionService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<SectionResponse>> Create(SectionRequest request)
     {
-        var response = await service.AddAsync(request);
-
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        var response = await service.AddAsync(request); 
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -64,10 +60,10 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult> Update(int id, SectionRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -75,7 +71,7 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
     [HttpDelete("by-number/{sectionNumber}")]
@@ -86,6 +82,6 @@ public class SectionsController(ISectionService service) : ControllerBase
     public async Task<ActionResult> Delete(string sectionNumber)
     {
         var response = await service.DeleteAsync(sectionNumber);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

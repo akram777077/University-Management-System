@@ -1,5 +1,4 @@
 ﻿using Applications.DTOs.Users;
-using Applications.Helpers;
 using Applications.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
@@ -8,44 +7,28 @@ namespace Presentation.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController(IUserService service) : ControllerBase
     {
-        private readonly IUserService _service;
-
-        public UsersController(IUserService service)
-        {
-            _service = service;
-        }
-
-
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetList()
         {
-            var result = await _service.GetListAsync();
-
-            if (!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetListAsync();
+            return response.HandleResult();
         }
 
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserResponse>> GetById(int id)
         {
-            var result = await _service.GetByIdAsync(id);
-
-            if (!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetByIdAsync(id);
+            return response.HandleResult();
         }
 
 
@@ -56,12 +39,8 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserResponse>> GetByUsername(string username)
         {
-            var result = await _service.GetByUsernameAsync(username);
-
-            if (!result.IsSuccess)
-                return result.HandleResult();
-
-            return Ok(result.Value);
+            var response = await service.GetByUsernameAsync(username);
+            return response.HandleResult();
         }
 
 
@@ -70,30 +49,22 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserResponse>> Create(CreateUserRequest? request)
+        public async Task<ActionResult<UserResponse>> Create(CreateUserRequest request)
         {
-            var response = await _service.AddAsync(request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+            var response = await service.AddAsync(request);
+            return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(int id)
         {
-            var response = await _service.DeleteAsync(id);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.DeleteAsync(id);
+            return response.HandleResult();
         }
 
 
@@ -104,59 +75,43 @@ namespace Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(string username)
         {
-            var response = await _service.DeleteAsync(username);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.DeleteAsync(username);
+            return response.HandleResult();
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Update(int id, UpdateUserRequest? request)
+        public async Task<ActionResult> Update(int id, UpdateUserRequest request)
         {
-            var response = await _service.UpdateAsync(id, request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.UpdateAsync(id, request);
+            return response.HandleResult();
         }
 
 
-        [HttpPatch("{id}/role")]
+        [HttpPatch("{id:int}/role")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateUserRole(int id, UpdateUserRoleRequest? request)
+        public async Task<ActionResult> UpdateUserRole(int id, UpdateUserRoleRequest request)
         {
-            var response = await _service.UpdateUserRoleAsync(id, request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.UpdateUserRoleAsync(id, request);
+            return response.HandleResult();
         }
 
-        [HttpPatch("{id}/password")]
+        [HttpPatch("{id:int}/password")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ChangePassword(int id, ChangePasswordRequest? request)
+        public async Task<ActionResult> ChangePassword(int id, ChangePasswordRequest request)
         {
-            var response = await _service.ChangePasswordAsync(id, request);
-
-            if (!response.IsSuccess)
-                return response.HandleResult();
-
-            return NoContent();
+            var response = await service.ChangePasswordAsync(id, request);
+            return response.HandleResult();
         }
     }
 }

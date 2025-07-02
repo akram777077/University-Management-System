@@ -6,7 +6,7 @@ using Presentation.Controllers.ResultExtension;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/serviceOffers")]
+[Route("api/service-offers")]
 public class ServiceOffersController(IServiceOfferService service) : ControllerBase
 {
     [HttpGet]
@@ -16,11 +16,11 @@ public class ServiceOffersController(IServiceOfferService service) : ControllerB
     public async Task<ActionResult<IEnumerable<ServiceOfferResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -28,7 +28,7 @@ public class ServiceOffersController(IServiceOfferService service) : ControllerB
     public async Task<ActionResult<ServiceOfferResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
 
@@ -37,17 +37,14 @@ public class ServiceOffersController(IServiceOfferService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ServiceOfferResponse>> Create(ServiceOfferRequest? request)
+    public async Task<ActionResult<ServiceOfferResponse>> Create(ServiceOfferRequest request)
     {
         var response = await service.AddAsync(request);
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -55,18 +52,18 @@ public class ServiceOffersController(IServiceOfferService service) : ControllerB
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Update(int id, ServiceOfferRequest? request)
+    public async Task<ActionResult> Update(int id, ServiceOfferRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

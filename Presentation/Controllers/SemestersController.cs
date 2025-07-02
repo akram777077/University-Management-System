@@ -16,7 +16,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult<IEnumerable<SemesterResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpGet("{id:int}")]
@@ -27,7 +27,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult<SemesterResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpGet("by-term-code/{termCode}")]
@@ -38,7 +38,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult<SemesterResponse>> GetByTermCode(string termCode)
     {
         var response = await service.GetByTermCodeAsync(termCode);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -49,11 +49,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult<SemesterResponse>> Create(SemesterRequest request)
     {
         var response = await service.AddAsync(request);
-
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
     [HttpPut("{id:int}")]
@@ -64,7 +60,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult> Update(int id, SemesterRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
     [HttpPatch("{id:int}/deactivate")]
@@ -75,7 +71,7 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult> Deactivate(int id)
     {
         var response = await service.DeactivateSemesterAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
     [HttpDelete("{id:int}")]
@@ -86,6 +82,6 @@ public class SemestersController(ISemesterService service) : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

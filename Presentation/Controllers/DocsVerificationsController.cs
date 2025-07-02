@@ -6,7 +6,7 @@ using Presentation.Controllers.ResultExtension;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/docsVerifications")]
+[Route("api/docs-verifications")]
 public class DocsVerificationsController(IDocsVerificationService service) : ControllerBase
 {
     [HttpGet]
@@ -16,10 +16,10 @@ public class DocsVerificationsController(IDocsVerificationService service) : Con
     public async Task<ActionResult<IEnumerable<DocsVerificationResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,10 +27,10 @@ public class DocsVerificationsController(IDocsVerificationService service) : Con
     public async Task<ActionResult<DocsVerificationResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("by-person/{personId}")]
+    [HttpGet("by-person/{personId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,46 +38,42 @@ public class DocsVerificationsController(IDocsVerificationService service) : Con
     public async Task<ActionResult<DocsVerificationResponse>> GetByPersonId(int personId)
     {
         var response = await service.GetByPersonIdAsync(personId);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<DocsVerificationResponse>> Create(DocsVerificationRequest? request)
+    public async Task<ActionResult<DocsVerificationResponse>> Create(DocsVerificationRequest request)
     {
         var response = await service.CreateAsync(request);
-        
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Update(int id, DocsVerificationRequest? request)
+    public async Task<ActionResult> Update(int id, DocsVerificationRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpPatch("{id}/verify")]
+    [HttpPatch("{id:int}/verify")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> VerifyDocument(int id, VerifyDocumentRequest? request)
+    public async Task<ActionResult> VerifyDocument(int id, VerifyDocumentRequest request)
     {
         var response = await service.VerifyDocumentAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -85,6 +81,6 @@ public class DocsVerificationsController(IDocsVerificationService service) : Con
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

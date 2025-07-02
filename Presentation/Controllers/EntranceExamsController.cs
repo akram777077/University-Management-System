@@ -6,7 +6,7 @@ using Presentation.Controllers.ResultExtension;
 namespace Presentation.Controllers;
 
 [ApiController]
-[Route("api/entranceExams")]
+[Route("api/entrance-exams")]
 public class EntranceExamsController(IEntranceExamService service) : ControllerBase
 {
     [HttpGet]
@@ -16,10 +16,10 @@ public class EntranceExamsController(IEntranceExamService service) : ControllerB
     public async Task<ActionResult<IEnumerable<EntranceExamResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,23 +27,20 @@ public class EntranceExamsController(IEntranceExamService service) : ControllerB
     public async Task<ActionResult<EntranceExamResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<EntranceExamResponse>> Create(EntranceExamRequest? request)
+    public async Task<ActionResult<EntranceExamResponse>> Create(EntranceExamRequest request)
     {
         var response = await service.AddAsync(request);
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,43 +48,43 @@ public class EntranceExamsController(IEntranceExamService service) : ControllerB
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Update(int id, EntranceExamRequest? request)
+    public async Task<ActionResult> Update(int id, EntranceExamRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpPatch("{id}/score")]
+    [HttpPatch("{id:int}/score")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> UpdateScore(int id, UpdateScoreRequest? request)
+    public async Task<ActionResult> UpdateScore(int id, UpdateScoreRequest request)
     {
         var response = await service.UpdateStudentScoreAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
     
-    [HttpPatch("{id}/criteria")]
+    [HttpPatch("{id:int}/criteria")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> UpdateScoreCriteria(int id, UpdateScoreCriteriaRequest? request)
+    public async Task<ActionResult> UpdateScoreCriteria(int id, UpdateScoreCriteriaRequest request)
     {
         var response = await service.UpdateScoreCriteriaAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
     
-    [HttpPatch("{id}/cancel")]
+    [HttpPatch("{id:int}/cancel")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -95,6 +92,6 @@ public class EntranceExamsController(IEntranceExamService service) : ControllerB
     public async Task<ActionResult> CancelExam(int id, string? notes)
     {
         var response = await service.CancelExamAsync(id, notes);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

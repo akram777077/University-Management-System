@@ -16,10 +16,10 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult<IEnumerable<EnrollmentResponse>>> GetList()
     {
         var response = await service.GetListAsync();
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -27,10 +27,10 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult<EnrollmentResponse>> GetById(int id)
     {
         var response = await service.GetByIdAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
-    [HttpGet("by-student/{studentId}")]
+    [HttpGet("by-student/{studentId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -38,7 +38,7 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult<EnrollmentResponse>> GetByStudentId(int studentId)
     {
         var response = await service.GetByStudentIdAsync(studentId);
-        return !response.IsSuccess ? response.HandleResult() : Ok(response.Value);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -48,14 +48,10 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult<EnrollmentResponse>> Create(EnrollmentRequest request)
     {
         var response = await service.AddAsync(request);
-
-        if (!response.IsSuccess)
-            return response.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = response.Value.Id }, response.Value);
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,10 +59,10 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult> Update(int id, EnrollmentRequest request)
     {
         var response = await service.UpdateAsync(id, request);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +70,6 @@ public class EnrollmentsController(IEnrollmentService service) : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var response = await service.DeleteAsync(id);
-        return !response.IsSuccess ? response.HandleResult() : NoContent();
+        return response.HandleResult();
     }
 }

@@ -15,41 +15,41 @@ public class GradesController(IGradeService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<GradeResponse>>> GetList()
     {
-        var result = await service.GetListAsync();
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetListAsync();
+        return response.HandleResult();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GradeResponse>> GetById(int id)
     {
-        var result = await service.GetByIdAsync(id);
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetByIdAsync(id);
+        return response.HandleResult();
     }
 
-    [HttpGet("student/{studentNumber}")]
+    [HttpGet("student/{studentId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<GradeResponse>>> GetByStudentId(int studentId)
     {
-        var result = await service.GetByStudentIdAsync(studentId);
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetByStudentIdAsync(studentId);
+        return response.HandleResult();
     }
 
-    [HttpGet("course/{courseId}")]
+    [HttpGet("course/{courseId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IEnumerable<GradeResponse>>> GetByCourseId(int courseId)
     {
-        var result = await service.GetByCourseIdAsync(courseId);
-        return !result.IsSuccess ? result.HandleResult() : Ok(result.Value);
+        var response = await service.GetByCourseIdAsync(courseId);
+        return response.HandleResult();
     }
 
     [HttpPost]
@@ -58,32 +58,29 @@ public class GradesController(IGradeService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GradeResponse>> Create(GradeRequest request)
     {
-        var result = await service.AddAsync(request);
-        if (!result.IsSuccess)
-            return result.HandleResult();
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        var response = await service.AddAsync(request); 
+        return response.HandleResult(nameof(GetById), new { id = response.Value.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Update(int id, GradeRequest request)
     {
-        var result = await service.UpdateAsync(id, request);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.UpdateAsync(id, request);
+        return response.HandleResult();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(int id)
     {
-        var result = await service.DeleteAsync(id);
-        return !result.IsSuccess ? result.HandleResult() : NoContent();
+        var response = await service.DeleteAsync(id);
+        return response.HandleResult();
     }
 }
