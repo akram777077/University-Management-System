@@ -69,11 +69,11 @@ public class EntranceExamService : IEntranceExamService
     {
         if (request == default)
             return Result<EntranceExamResponse>.Failure("Entrance exam information is required", ErrorType.BadRequest);
-
-        var exam = _mapper.Map<EntranceExam>(request);
         
         try
         {
+            var exam = _mapper.Map<EntranceExam>(request);
+            
             int id = await _repository.AddAsync(exam);
             if (id <= 0)
                 return Result<EntranceExamResponse>.Failure("Failed to create new entrance exam", ErrorType.BadRequest);

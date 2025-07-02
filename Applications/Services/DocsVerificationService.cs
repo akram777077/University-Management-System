@@ -91,8 +91,7 @@ public class DocsVerificationService : IDocsVerificationService
     public async Task<Result<DocsVerificationResponse>> CreateAsync(DocsVerificationRequest request)
     {
         if (request == default)
-            return Result<DocsVerificationResponse>.Failure(
-                "Verification data is required", ErrorType.BadRequest);
+            return Result<DocsVerificationResponse>.Failure("Verification data is required", ErrorType.BadRequest);
 
         try
         {
