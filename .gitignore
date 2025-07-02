@@ -13,6 +13,9 @@
 # Ignore ErrorLogs
 ErrorLogs.txt
 
+# .gitignore
+.idea/
+
 # Ignore .env files (real credentials)
 .env
 *.env
