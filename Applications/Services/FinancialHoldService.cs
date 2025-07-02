@@ -1,6 +1,5 @@
 using Applications.DTOs.FinancialHold;
 using Applications.Helpers;
-using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
@@ -15,7 +14,7 @@ public class FinancialHoldService : IFinancialHoldService
 {
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
-    private readonly IMyLogger _logger;
+    private readonly IMyLogger _logger; //Refactor this
 
     public FinancialHoldService(IUnitOfWork uow, IMapper mapper, IMyLogger logger)
     {

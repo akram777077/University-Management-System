@@ -88,9 +88,9 @@ public class DocsVerificationService : IDocsVerificationService
                 "Failed to retrieve document verifications", ErrorType.InternalServerError);
         }
     }
-    public async Task<Result<DocsVerificationResponse>> CreateAsync(DocsVerificationRequest? request)
+    public async Task<Result<DocsVerificationResponse>> CreateAsync(DocsVerificationRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result<DocsVerificationResponse>.Failure(
                 "Verification data is required", ErrorType.BadRequest);
 
@@ -98,10 +98,10 @@ public class DocsVerificationService : IDocsVerificationService
         {
             var verification = _mapper.Map<DocsVerification>(request);
             
-            if(request.Value.SubmissionDate != null)
+            if(request.SubmissionDate != null)
                 verification.SubmissionDate = DateTime.UtcNow;
             
-            if(request.Value.Status == null)
+            if(request.Status == null)
                 verification.Status = VerificationStatus.Pending;
 
             int id = await _repository.AddAsync(verification);
@@ -118,9 +118,9 @@ public class DocsVerificationService : IDocsVerificationService
                 "Failed to create document verification", ErrorType.InternalServerError);
         }
     }
-    public async Task<Result> UpdateAsync(int id, DocsVerificationRequest? request)
+    public async Task<Result> UpdateAsync(int id, DocsVerificationRequest request)
     {
-        if (request == null)
+        if (request == default)
             return Result.Failure("Verification data is required", ErrorType.BadRequest);
 
         try
@@ -129,7 +129,7 @@ public class DocsVerificationService : IDocsVerificationService
             if (existingVerification == null)
                 return Result.Failure("Document verification not found", ErrorType.NotFound);
 
-            _mapper.Map(request.Value, existingVerification);
+            _mapper.Map(request, existingVerification);
 
             bool isUpdated = await _repository.UpdateAsync(existingVerification);
             return !isUpdated ? Result.Failure("Failed to update document verification", ErrorType.BadRequest) : Result.Success;
@@ -140,12 +140,12 @@ public class DocsVerificationService : IDocsVerificationService
             return Result.Failure("Failed to update document verification", ErrorType.InternalServerError);
         }
     }
-    public async Task<Result> VerifyDocumentAsync(int id, VerifyDocumentRequest? request)
+    public async Task<Result> VerifyDocumentAsync(int id, VerifyDocumentRequest request)
     {
         if (id <= 0)
             return Result.Failure("Invalid ID Provided", ErrorType.BadRequest);
 
-        if(request == null)
+        if(request == default)
             return Result.Failure("Verification data is required", ErrorType.BadRequest);
             
         try
@@ -155,16 +155,16 @@ public class DocsVerificationService : IDocsVerificationService
                 return Result.Failure("No Document Verification Found", ErrorType.NotFound);
             
             verification.VerificationDate = DateTime.UtcNow;
-            verification.VerifiedByUserId = request.Value.UserId;
-            verification.Status = request.Value.IsApproved != null ? VerificationStatus.Approved : VerificationStatus.Rejected;
-            verification.Notes = request.Value.Notes;
+            verification.VerifiedByUserId = request.UserId;
+            verification.Status = request.IsApproved != null ? VerificationStatus.Approved : VerificationStatus.Rejected;
+            verification.Notes = request.Notes;
 
             bool isUpdated = await _repository.UpdateAsync(verification);
             return !isUpdated ? Result.Failure("Failed to verify documents", ErrorType.BadRequest) : Result.Success;
         }
         catch (Exception ex)
         {
-            _logger.LogError("Database error verifying documents", ex, new { request.Value });
+            _logger.LogError("Database error verifying documents", ex, new { request });
             return Result.Failure("Failed to verify documents", ErrorType.InternalServerError);
         }
     }

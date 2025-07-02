@@ -27,7 +27,7 @@ namespace Applications.Services
             try
             {
                 var countries = await _repository.GetListAsync();
-                if (countries == null || !countries.Any())
+                if (!countries.Any())
                 {
                     return Result<IReadOnlyCollection<CountryResponse>>.Failure(
                         "No Countries found in the system", ErrorType.NotFound);
@@ -76,12 +76,8 @@ namespace Applications.Services
             try
             {
                 var country = await _repository.GetByNameAsync(name);
-
                 if (country == null)
-                {
-                    return Result<CountryResponse>.Failure(
-                        "Country not found with the specified name", ErrorType.NotFound);
-                }
+                    return Result<CountryResponse>.Failure("Country not found with the specified name", ErrorType.NotFound);
 
                 var countryDto = _mapper.Map<CountryResponse>(country);
                 return Result<CountryResponse>.Success(countryDto);
@@ -101,12 +97,8 @@ namespace Applications.Services
             try
             {
                 var country = await _repository.GetByCodeAsync(code);
-
                 if (country == null)
-                {
-                    return Result<CountryResponse>.Failure(
-                        "Country not found with the specified code", ErrorType.NotFound);
-                }
+                    return Result<CountryResponse>.Failure("Country not found with the specified code", ErrorType.NotFound);
 
                 var countryDto = _mapper.Map<CountryResponse>(country);
                 return Result<CountryResponse>.Success(countryDto);
