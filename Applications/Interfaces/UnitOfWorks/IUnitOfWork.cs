@@ -19,6 +19,10 @@ public interface IUnitOfWork : IDisposable, IAsyncDisposable
     ISemesterRepository Semesters { get; }
     ICourseRepository Courses { get; }
     IPrerequisiteRepository Prerequisites { get; }
-
+    ISectionRepository Sections { get; }
+    IRegistrationRepository Registrations { get; }
+    IGradeRepository Grades { get; }
+    IFinancialHoldRepository FinancialHolds { get;}
+    
     Task<int> CompleteAsync();
 }
