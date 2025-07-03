@@ -57,8 +57,8 @@ public class EnrollmentConfig: IEntityTypeConfiguration<Enrollment>
                 .HasForeignKey<Enrollment>(e => e.ServiceApplicationId)
                 .OnDelete(DeleteBehavior.Restrict);
             
-            builder.HasIndex(e => e.StudentId)
+            builder.HasIndex(e => new { e.StudentId, e.ProgramId })
                 .IsUnique()
-                .HasDatabaseName("ix_enrollments_student_id");
+                .HasDatabaseName("ix_enrollments_student_program");
         }
     }

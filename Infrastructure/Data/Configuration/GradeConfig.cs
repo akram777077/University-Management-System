@@ -62,8 +62,8 @@ public class GradeConfig : IEntityTypeConfiguration<Grade>
             .HasForeignKey(g => g.RegistrationId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.HasIndex(g => new { g.StudentId })
+        builder.HasIndex(g => new { g.StudentId, g.CourseId, g.SemesterId })
             .IsUnique()
-            .HasDatabaseName("ix_grades_student");
+            .HasDatabaseName("ix_grades_student_course_semester");
     }
 }

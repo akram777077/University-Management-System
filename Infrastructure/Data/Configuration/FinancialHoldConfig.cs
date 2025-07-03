@@ -69,5 +69,8 @@ public class FinancialHoldConfig : IEntityTypeConfiguration<FinancialHold>
 
         builder.HasIndex(fh => fh.StudentId)
             .HasDatabaseName("ix_financial_holds_student");
+
+        builder.HasIndex(fh => fh.IsActive)
+            .HasDatabaseName("ix_financial_holds_active");
     }
 }

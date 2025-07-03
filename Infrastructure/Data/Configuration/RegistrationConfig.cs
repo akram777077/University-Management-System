@@ -57,8 +57,8 @@ public class RegistrationConfig: IEntityTypeConfiguration<Registration>
                 .HasForeignKey(r => r.ProcessedByUserId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasIndex(r => new { r.StudentId })
+            builder.HasIndex(r => new { r.StudentId, r.SectionId, r.SemesterId })
                 .IsUnique()
-                .HasDatabaseName("ix_registrations_student_id");
+                .HasDatabaseName("ix_registrations_student_section_semester");
         }
     }

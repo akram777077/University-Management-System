@@ -74,8 +74,8 @@ public class SectionConfig : IEntityTypeConfiguration<Section>
             .HasForeignKey(s => s.ProfessorId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.HasIndex(s => new { s.SectionNumber })
+        builder.HasIndex(s => new { s.CourseId, s.SemesterId, s.SectionNumber })
             .IsUnique()
-            .HasDatabaseName("ix_sections_section_number");
+            .HasDatabaseName("ix_sections_course_semester_number");
     }
 }

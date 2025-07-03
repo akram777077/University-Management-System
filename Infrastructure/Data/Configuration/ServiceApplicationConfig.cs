@@ -35,7 +35,7 @@ public class ServiceApplicationConfig : IEntityTypeConfiguration<ServiceApplicat
         
         builder.Property(sa => sa.Notes)
             .HasColumnName("notes")
-            .HasColumnName("varchar")
+            .HasColumnType("varchar")
             .HasMaxLength(500);
         
         builder.Property(sa => sa.CompletedDate)
