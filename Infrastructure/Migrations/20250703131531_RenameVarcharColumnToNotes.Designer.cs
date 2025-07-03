@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703131531_RenameVarcharColumnToNotes")]
+    partial class RenameVarcharColumnToNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,9 +205,9 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ServiceApplicationId")
                         .IsUnique();
 
-                    b.HasIndex("StudentId", "ProgramId")
+                    b.HasIndex("StudentId")
                         .IsUnique()
-                        .HasDatabaseName("ix_enrollments_student_program");
+                        .HasDatabaseName("ix_enrollments_student_id");
 
                     b.ToTable("enrollments", (string)null);
                 });
@@ -312,9 +315,6 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("ix_financial_holds_active");
-
                     b.HasIndex("PlacedByUserId");
 
                     b.HasIndex("ResolvedByUserId");
@@ -373,9 +373,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SemesterId");
 
-                    b.HasIndex("StudentId", "CourseId", "SemesterId")
+                    b.HasIndex("StudentId")
                         .IsUnique()
-                        .HasDatabaseName("ix_grades_student_course_semester");
+                        .HasDatabaseName("ix_grades_student");
 
                     b.ToTable("grades", (string)null);
                 });
@@ -678,9 +678,9 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SemesterId");
 
-                    b.HasIndex("StudentId", "SectionId", "SemesterId")
+                    b.HasIndex("StudentId")
                         .IsUnique()
-                        .HasDatabaseName("ix_registrations_student_section_semester");
+                        .HasDatabaseName("ix_registrations_student_id");
 
                     b.ToTable("registrations", (string)null);
                 });
@@ -740,13 +740,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.HasIndex("ProfessorId");
 
-                    b.HasIndex("SemesterId");
-
-                    b.HasIndex("CourseId", "SemesterId", "SectionNumber")
+                    b.HasIndex("SectionNumber")
                         .IsUnique()
-                        .HasDatabaseName("ix_sections_course_semester_number");
+                        .HasDatabaseName("ix_sections_section_number");
+
+                    b.HasIndex("SemesterId");
 
                     b.ToTable("sections", (string)null);
                 });
