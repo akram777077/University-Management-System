@@ -42,25 +42,6 @@ namespace Infrastructure.Migrations
                 table: "semesters",
                 columns: new[] { "year", "term" },
                 unique: true);
-            
-            // Insert seed data
-            migrationBuilder.InsertData(
-                table: "semesters",
-                columns: new[] { "term_code", "term", "year", "start_date", "end_date", "registration_start_date", "registration_end_date", "is_active" },
-                values: new object[,]
-                {
-                    // Current and upcoming semesters
-                    { "FA24", "Fall", 2024, new DateTime(2024, 8, 26), new DateTime(2024, 12, 13), new DateTime(2024, 4, 1), new DateTime(2024, 5, 15), true },
-                    { "SU24", "Summer", 2024, new DateTime(2024, 6, 3), new DateTime(2024, 8, 9), new DateTime(2024, 3, 15), new DateTime(2024, 4, 15), true },
-                    { "SP24", "Spring", 2024, new DateTime(2024, 1, 16), new DateTime(2024, 5, 10), new DateTime(2023, 11, 1), new DateTime(2023, 12, 1), false },
-            
-                    // Future semester (in planning)
-                    { "SP25", "Spring", 2025, new DateTime(2025, 1, 21), new DateTime(2025, 5, 16), null, null, true },
-            
-                    // Past semesters
-                    { "FA23", "Fall", 2023, new DateTime(2023, 8, 28), new DateTime(2023, 12, 15), new DateTime(2023, 4, 1), new DateTime(2023, 5, 15), false },
-                    { "SU23", "Summer", 2023, new DateTime(2023, 6, 5), new DateTime(2023, 8, 11), new DateTime(2023, 3, 13), new DateTime(2023, 4, 14), false }
-                });
         }
 
         /// <inheritdoc />
