@@ -25,15 +25,6 @@ namespace Infrastructure.Data.Configuration
                 .HasColumnName("student_status")
                 .HasConversion<int>();
 
-            builder.Property(s => s.EnrollmentDate)
-                .HasColumnName("enrollment_date")
-                .HasColumnType("date")
-                .IsRequired();
-
-            builder.Property(s => s.ExpectedGradDate)
-                .HasColumnName("expected_graduation_date")
-                .HasColumnType("date");
-
             builder.Property(s => s.Notes)
                 .HasColumnName("notes")
                 .HasColumnType("varchar")
