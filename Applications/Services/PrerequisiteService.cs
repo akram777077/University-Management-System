@@ -1,9 +1,9 @@
 using Applications.DTOs.Prerequisite;
 using Applications.Helpers;
+using Applications.Interfaces.Logging;
 using Applications.Interfaces.Services;
 using Applications.Interfaces.UnitOfWorks;
 using Applications.Shared;
-using Applications.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;

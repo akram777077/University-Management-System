@@ -1,8 +1,8 @@
 ﻿using Applications.DTOs;
+using Applications.Interfaces.Logging;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Shared;
-using Applications.Utilities;
 using AutoMapper;
 using Domain.Enums;
 
