@@ -1,4 +1,6 @@
-﻿namespace Applications.Utilities
+﻿using Applications.Interfaces.Logging;
+
+namespace Infrastructure.Logging
 {
     public class MyLogger : IMyLogger
     {

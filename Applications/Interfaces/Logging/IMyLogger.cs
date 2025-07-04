@@ -1,4 +1,4 @@
-﻿namespace Applications.Utilities
+﻿namespace Applications.Interfaces.Logging
 {
     public interface IMyLogger
     {
