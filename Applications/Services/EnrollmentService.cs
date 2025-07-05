@@ -1,11 +1,11 @@
 using Applications.DTOs.Enrollment;
 using Applications.Interfaces.Repositories;
 using Applications.Shared;
-using Applications.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
 using Applications.Helpers;
+using Applications.Interfaces.Logging;
 using Applications.Interfaces.Services;
 using Applications.Interfaces.UnitOfWorks;
 

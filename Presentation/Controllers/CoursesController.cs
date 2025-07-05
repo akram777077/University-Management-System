@@ -1,5 +1,6 @@
 using Applications.DTOs.Course;
 using Applications.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
 
@@ -7,6 +8,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/courses")]
+[Authorize]
 public class CoursesController(ICourseService service) : ControllerBase
 {
     [HttpGet]

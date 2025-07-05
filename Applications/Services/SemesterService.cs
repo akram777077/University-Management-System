@@ -1,9 +1,9 @@
 using Applications.DTOs.Semester;
 using Applications.Helpers;
+using Applications.Interfaces.Logging;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Shared;
-using Applications.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;

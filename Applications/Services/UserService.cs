@@ -1,9 +1,10 @@
 ﻿using Applications.DTOs.Users;
 using Applications.Helpers;
+using Applications.Interfaces.Auth;
+using Applications.Interfaces.Logging;
 using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Shared;
-using Applications.Utilities;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
@@ -13,13 +14,15 @@ namespace Applications.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
+        private readonly IPasswordHasher _hasher;
         private readonly IMapper _mapper;
         private readonly IMyLogger _logger;
 
-        public UserService(IUserRepository repository, IMyLogger logger, IMapper mapper)
+        public UserService(IUserRepository repository, IMyLogger logger, IMapper mapper, IPasswordHasher hasher)
         {
             _repository = repository;
             _mapper = mapper;
+            _hasher = hasher;
             _logger = logger;
         }
 
@@ -103,7 +106,7 @@ namespace Applications.Services
                     return Result<UserResponse>.Failure("User already exists", ErrorType.Conflict);
 
                 var user = _mapper.Map<User>(request);
-                user.Password = user.SetPassword(request.Password);
+                user.Password = _hasher.HashPassword(request.Password);
                 
                 int id = await _repository.AddAsync(user);
                 if (id <= 0)
@@ -191,11 +194,11 @@ namespace Applications.Services
                 if (user == null)
                     return Result<UserResponse>.Failure("User not found with the specified ID", ErrorType.NotFound);
 
-                bool isCorrectPassword = user.VerifyPassword(request.CurrentPassword, user.Password);
+                bool isCorrectPassword = _hasher.VerifyPassword(request.CurrentPassword, user.Password);
                 if(!isCorrectPassword)
                     return Result.Failure("Incorrect current password", ErrorType.BadRequest);
 
-                user.Password = user.SetPassword(request.NewPassword);
+                user.Password = _hasher.HashPassword(request.NewPassword);
                 user.LastLoginAt = DateTime.UtcNow;
                 
                 bool isUpdated = await _repository.UpdateAsync(user);
