@@ -1,8 +1,9 @@
-﻿using Applications.Interfaces.Repositories;
+﻿using Applications.Interfaces.Auth;
+using Applications.Interfaces.Logging;
+using Applications.Interfaces.Repositories;
 using Applications.Interfaces.Services;
 using Applications.Mappers;
 using Applications.Services;
-using Applications.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Applications
@@ -12,8 +13,7 @@ namespace Applications
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(MappingProfile));
-
-            services.AddScoped<IMyLogger, MyLogger>();
+            
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IPersonService, PersonService>();
             services.AddScoped<IStudentService, StudentService>();
@@ -33,6 +33,9 @@ namespace Applications
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IGradeService, GradeService>();
             services.AddScoped<IFinancialHoldService, FinancialHoldService>();
+            
+            //Authentication
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             
             return services;
         }
