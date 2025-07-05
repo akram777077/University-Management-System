@@ -61,11 +61,15 @@ public class JwtTokenService : IJwtTokenService
     }
     
     private Claim[] GetUserClaims(User user)
-    { 
+    {
         return new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
-        }; 
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                ClaimValueTypes.Integer64)
+        };
     }
 }

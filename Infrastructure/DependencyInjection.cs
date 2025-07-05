@@ -29,9 +29,8 @@ namespace Infrastructure
                 options.Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new InvalidOperationException("JWT_AUDIENCE environment variable is not set");
                 options.LifeTime = int.Parse(Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_LIFETIME_MINUTES") ?? "15");
             });
-            
-            var connectionString = configuration["DefaultConnection"];
 
+            var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
             services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
             
             services.AddAuthentication(options =>
