@@ -1,5 +1,6 @@
 using Applications.DTOs.FinancialHold;
 using Applications.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
 
@@ -7,6 +8,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/financial-holds")]
+[Authorize]
 public class FinancialHoldsController(IFinancialHoldService service) : ControllerBase
 {
     [HttpGet]

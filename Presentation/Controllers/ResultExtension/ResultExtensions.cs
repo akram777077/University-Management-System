@@ -89,6 +89,7 @@ public static class ResultExtensions
             ErrorType.NotFound => new NotFoundObjectResult(result.Error),
             ErrorType.BadRequest => new BadRequestObjectResult(result.Error),
             ErrorType.Conflict => new ConflictObjectResult(result.Error),
+            ErrorType.Unauthorized => new UnauthorizedObjectResult(result.Error),
             _ => new ObjectResult(result.Error) { StatusCode = 500 }
         };
     }

@@ -1,5 +1,6 @@
 ﻿using Applications.DTOs;
 using Applications.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Controllers.ResultExtension;
 
@@ -7,6 +8,7 @@ namespace Presentation.Controllers;
 
 [ApiController]
 [Route("api/countries")]
+[AllowAnonymous]
 public class CountriesController(ICountryService service) : ControllerBase
 {
     [HttpGet]
